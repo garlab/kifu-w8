@@ -103,11 +103,9 @@ namespace Kifu.Pages
 
         private void Canvas_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
-            var p = e.GetCurrentPoint(GobanCanvas).Position;
-            int x = (int) (p.X * _goban.Size / _size);
-            int y = (int) (p.Y * _goban.Size / _size);
+            var point = Convert(e.GetCurrentPoint(GobanCanvas).Position);
 
-            Stone stone = new Stone(_goban.CurrentColour, new GoLib.Point(x, y));
+            Stone stone = new Stone(_goban.CurrentColour, point);
 
             if (_goban.isMoveValid(stone))
             {
@@ -120,23 +118,35 @@ namespace Kifu.Pages
         public void draw(Stone stone)
         {
             var image = getImage(stone);
+            var point = Convert(stone.Point);
 
-            double left = stone.Point.X * _size / _goban.Size;
-            double top = stone.Point.Y * _size / _goban.Size;
-
-            Canvas.SetTop(image, top);
-            Canvas.SetLeft(image, left);
+            Canvas.SetTop(image, point.Y);
+            Canvas.SetLeft(image, point.X);
             GobanCanvas.Children.Add(image);
-            _stones[stone.Point.X, stone.Point.Y] = image;
+            _stones[stone.Point.X - 1, stone.Point.Y - 1] = image;
         }
 
         private void undraw(List<Stone> stones)
         {
             foreach (var stone in stones)
             {
-                var image = _stones[stone.Point.X, stone.Point.Y];
+                var image = _stones[stone.Point.X - 1, stone.Point.Y - 1];
                 GobanCanvas.Children.Remove(image);
             }
+        }
+
+        public GoLib.Point Convert(Windows.Foundation.Point p)
+        {
+            int x = (int)(p.X * _goban.Size / _size) + 1;
+            int y = (int)(p.Y * _goban.Size / _size) + 1;
+            return new GoLib.Point(x, y);
+        }
+
+        public Windows.Foundation.Point Convert(GoLib.Point p)
+        {
+            double x = (p.X - 1) * _size / _goban.Size;
+            double y = (p.Y - 1) * _size / _goban.Size;
+            return new Windows.Foundation.Point(x, y);
         }
 
         private Image getImage(Stone stone, bool alpha = false)

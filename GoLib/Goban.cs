@@ -42,6 +42,19 @@ namespace GoLib
             _first = first;
             _board = new Section[size + 2, size + 2];
             _moves = new List<Move>();
+            Sentinels(size);
+        }
+
+        private void Sentinels(int size)
+        {
+            var sentinel = new Stone(Colour.None, new Point(-1,-1));
+            for (var i = 0; i < size - 2; ++i)
+            {
+                _board[0, i].stone = sentinel;
+                _board[i, 0].stone = sentinel;
+                _board[size + 1, i].stone = sentinel;
+                _board[i, size + 1].stone = sentinel;
+            }
         }
 
         public int Size
@@ -149,7 +162,7 @@ namespace GoLib
             var neighbors = new HashSet<StoneGroup>();
             foreach (var neighbor in StoneNeighbors(stone.Point))
             {
-                if (!sameColor || stone.Color == neighbor.Color)
+                if (neighbor.Color != Colour.None && (!sameColor || stone.Color == neighbor.Color))
                 {
                     var s = _board[neighbor.Point.X, neighbor.Point.Y].stoneGroup;
                     neighbors.Add(s);
