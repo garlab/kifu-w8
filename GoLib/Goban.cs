@@ -47,8 +47,8 @@ namespace GoLib
 
         private void Sentinels(int size)
         {
-            var sentinel = new Stone(Colour.None, new Point(-1,-1));
-            for (var i = 0; i < size - 2; ++i)
+            var sentinel = new Stone(Colour.None, new Point(-1, -1));
+            for (int i = 0; i < size - 2; ++i)
             {
                 _board[0, i].stone = sentinel;
                 _board[i, 0].stone = sentinel;
@@ -79,7 +79,7 @@ namespace GoLib
 
         public bool isMoveValid(Stone stone)
         {
-            if (isEmpty(stone.Point) && !isKo(stone.Point))
+            if (isEmpty(stone.Point) && !isKo(stone))
             {
                 return ActualLiberties(stone).Count > 0 || CaptureValue(stone) > 0;
             }
@@ -92,9 +92,9 @@ namespace GoLib
         private HashSet<Point> ActualLiberties(Stone stone)
         {
             var liberties = new HashSet<Point>(Liberties(stone));
-            foreach (StoneGroup neighbor in GroupNeighbors(stone, true))
+            foreach (var neighbor in GroupNeighbors(stone, true))
             {
-                foreach (Point liberty in neighbor.Liberties)
+                foreach (var liberty in neighbor.Liberties)
                 {
                     liberties.Add(liberty);
                 }
@@ -121,20 +121,17 @@ namespace GoLib
             return _board[p.X, p.Y].stone == null;
         }
 
-        // TODO: gérer les ko
-        private bool isKo(Point point)
+        private bool isKo(Stone stone)
         {
-            return false;
+            return _moves.Count != 0 && stone == _moves[_moves.Count - 1].Ko;
         }
 
         private IEnumerable<Point> Neighbors(Point p)
         {
-            return new List<Point>() {
-                new Point(p.X + 1, p.Y),
-                new Point(p.X, p.Y + 1),
-                new Point(p.X - 1, p.Y),
-                new Point(p.X, p.Y - 1)
-            };
+            yield return new Point(p.X + 1, p.Y);
+            yield return new Point(p.X, p.Y + 1);
+            yield return new Point(p.X - 1, p.Y);
+            yield return new Point(p.X, p.Y - 1);
         }
 
         private IEnumerable<Stone> StoneNeighbors(Point p)
@@ -146,29 +143,26 @@ namespace GoLib
 
         private IEnumerable<Point> Liberties(Stone stone)
         {
-            var liberties = new List<Point>();
             foreach (var point in Neighbors(stone.Point))
             {
                 if (_board[point.X, point.Y].stone == null)
                 {
-                    liberties.Add(point);
+                    yield return point;
                 }
             }
-            return liberties;
         }
 
-        private HashSet<StoneGroup> GroupNeighbors(Stone stone, bool sameColor = false)
+        private IEnumerable<StoneGroup> GroupNeighbors(Stone stone, bool sameColor = false)
         {
-            var neighbors = new HashSet<StoneGroup>();
+            var groups = new HashSet<StoneGroup>();
             foreach (var neighbor in StoneNeighbors(stone.Point))
             {
                 if (neighbor.Color != Colour.None && (!sameColor || stone.Color == neighbor.Color))
                 {
-                    var s = _board[neighbor.Point.X, neighbor.Point.Y].stoneGroup;
-                    neighbors.Add(s);
+                    groups.Add(_board[neighbor.Point.X, neighbor.Point.Y].stoneGroup);
                 }
             }
-            return neighbors;
+            return groups;
         }
 
         public Move Move(Stone stone)
@@ -177,9 +171,22 @@ namespace GoLib
             AddGroup(stone);
 
             var move = new Move(stone);
-            _moves.Add(move);
             RemoveNeighborLiberties(move);
+            UpdateKo(move);
+            _moves.Add(move);
             return move;
+        }
+
+        private void UpdateKo(Move move)
+        {
+            int x = move.Stone.Point.X;
+            int y = move.Stone.Point.Y;
+            if (_board[x, y].stoneGroup.Stones.Count == 1
+                && _board[x, y].stoneGroup.Liberties.Count == 1
+                && move.Captured.Count == 1)
+            {
+                move.Ko = move.Captured[0];
+            }
         }
 
         // TODO: improve merge method strategy

@@ -9,11 +9,13 @@ namespace GoLib
     {
         private Stone _stone;
         private List<Stone> _captured;
+        private Stone _ko;
 
         public Move(Stone stone)
         {
             _stone = stone;
             _captured = new List<Stone>();
+            _ko = null;
         }
 
         public Stone Stone
@@ -24,6 +26,12 @@ namespace GoLib
         public List<Stone> Captured
         {
             get { return _captured; }
+        }
+
+        public Stone Ko
+        {
+            get { return _ko; }
+            set { _ko = value; }
         }
     }
 }

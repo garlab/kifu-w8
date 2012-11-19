@@ -38,11 +38,13 @@ namespace GoLib
 
         public static bool operator ==(Point a, Point b)
         {
-            if (Object.ReferenceEquals(a,b)) {
+            if (Object.ReferenceEquals(a,b))
+            {
                 return true;
             }
             
-            if ((object)a == null || (object)b == null) {
+            if ((object)a == null || (object)b == null)
+            {
                 return false;
             }
             
