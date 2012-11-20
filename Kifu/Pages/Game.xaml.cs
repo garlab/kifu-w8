@@ -61,8 +61,8 @@ namespace Kifu.Pages
 
         private void GobanCanvas_Loaded(object sender, RoutedEventArgs e)
         {
-            _size = GobanCanvas.ActualWidth > GobanCanvas.ActualHeight ? GobanCanvas.ActualHeight : GobanCanvas.ActualWidth;
-            GobanCanvas.Width = GobanCanvas.Height = _size;
+            _size = gobanCanvas.ActualWidth > gobanCanvas.ActualHeight ? gobanCanvas.ActualHeight : gobanCanvas.ActualWidth;
+            gobanCanvas.Width = gobanCanvas.Height = _size;
             DrawGrid();
         }
 
@@ -84,7 +84,7 @@ namespace Kifu.Pages
                 v.X2 = _size / (2 * _goban.Size) + (_goban.Size - 1) * _size / _goban.Size;
                 v.Y2 = v.Y1;
                 v.Stroke = brush;
-                GobanCanvas.Children.Add(v);
+                gobanCanvas.Children.Add(v);
 
                 var h = new Line();
                 h.X1 = _size / (2 * _goban.Size) + i * _size / _goban.Size;
@@ -92,18 +92,18 @@ namespace Kifu.Pages
                 h.X2 = h.X1;
                 h.Y2 = _size / (2 * _goban.Size) + (_goban.Size - 1) * _size / _goban.Size;
                 h.Stroke = brush;
-                GobanCanvas.Children.Add(h);
+                gobanCanvas.Children.Add(h);
             }
         }
 
         private void Canvas_PointerMoved(object sender, PointerRoutedEventArgs e)
         {
-            
+
         }
 
         private void Canvas_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
-            var point = Convert(e.GetCurrentPoint(GobanCanvas).Position);
+            var point = Convert(e.GetCurrentPoint(gobanCanvas).Position);
 
             Stone stone = new Stone(_goban.CurrentColour, point);
 
@@ -111,28 +111,28 @@ namespace Kifu.Pages
             {
                 Move move = _goban.Move(stone);
                 draw(stone);
-                undraw(move.Captured);
+                foreach (var captured in move.Captured)
+                {
+                    undraw(captured);
+                }
             }
         }
 
-        public void draw(Stone stone)
+        private void draw(Stone stone)
         {
             var image = getImage(stone);
             var point = Convert(stone.Point);
 
             Canvas.SetTop(image, point.Y);
             Canvas.SetLeft(image, point.X);
-            GobanCanvas.Children.Add(image);
+            gobanCanvas.Children.Add(image);
             _stones[stone.Point.X - 1, stone.Point.Y - 1] = image;
         }
 
-        private void undraw(List<Stone> stones)
+        private void undraw(Stone stone)
         {
-            foreach (var stone in stones)
-            {
-                var image = _stones[stone.Point.X - 1, stone.Point.Y - 1];
-                GobanCanvas.Children.Remove(image);
-            }
+            var image = _stones[stone.Point.X - 1, stone.Point.Y - 1];
+            gobanCanvas.Children.Remove(image);
         }
 
         public GoLib.Point Convert(Windows.Foundation.Point p)
@@ -157,6 +157,24 @@ namespace Kifu.Pages
             var uri = stone.Color == Colour.Black ? "ms-appx:///Assets/StoneBlack.png" : "ms-appx:///Assets/StoneWhite.png";
             image.Source = new BitmapImage(new Uri(uri));
             return image;
+        }
+
+        private void passButton_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO: Pass feature
+        }
+
+        private void undoButton_Click(object sender, RoutedEventArgs e)
+        {
+            Move undo = _goban.Undo();
+            if (undo != null)
+            {
+                undraw(undo.Stone);
+                foreach (var captured in undo.Captured)
+                {
+                    draw(captured);
+                }
+            }
         }
     }
 }

@@ -47,13 +47,12 @@ namespace GoLib
 
         private void Sentinels(int size)
         {
-            var sentinel = new Stone(Colour.None, new Point(-1, -1));
-            for (int i = 0; i < size - 2; ++i)
+            for (int i = 1; i < size - 1; ++i)
             {
-                _board[0, i].stone = sentinel;
-                _board[i, 0].stone = sentinel;
-                _board[size + 1, i].stone = sentinel;
-                _board[i, size + 1].stone = sentinel;
+                _board[0, i].stone = Stone.FAKE;
+                _board[i, 0].stone = Stone.FAKE;
+                _board[size + 1, i].stone = Stone.FAKE;
+                _board[i, size + 1].stone = Stone.FAKE;
             }
         }
 
@@ -77,6 +76,11 @@ namespace GoLib
             get { return Round % 2 == 0 ? _first : _first.OpponentColor(); }
         }
 
+        private StoneGroup StoneGroup(Stone stone)
+        {
+            return _board[stone.Point.X, stone.Point.Y].stoneGroup;
+        }
+
         public bool isMoveValid(Stone stone)
         {
             if (isEmpty(stone.Point) && !isKo(stone))
@@ -94,10 +98,7 @@ namespace GoLib
             var liberties = new HashSet<Point>(Liberties(stone));
             foreach (var neighbor in GroupNeighbors(stone, true))
             {
-                foreach (var liberty in neighbor.Liberties)
-                {
-                    liberties.Add(liberty);
-                }
+                liberties.UnionWith(neighbor.Liberties);
             }
             liberties.Remove(stone.Point);
             return liberties;
@@ -134,11 +135,16 @@ namespace GoLib
             yield return new Point(p.X, p.Y - 1);
         }
 
-        private IEnumerable<Stone> StoneNeighbors(Point p)
+        private IEnumerable<Stone> StoneNeighbors(Stone stone, bool sameColor = false)
         {
-            var neighbors = new HashSet<Stone>() { _board[p.X + 1, p.Y].stone, _board[p.X, p.Y + 1].stone, _board[p.X - 1, p.Y].stone, _board[p.X, p.Y - 1].stone };
-            neighbors.Remove(null);
-            return neighbors;
+            foreach (var point in Neighbors(stone.Point))
+            {
+                var neighbor = _board[point.X, point.Y].stone;
+                if (neighbor != null && (!sameColor || stone.Color == neighbor.Color))
+                {
+                    yield return neighbor;
+                }
+            }
         }
 
         private IEnumerable<Point> Liberties(Stone stone)
@@ -155,11 +161,11 @@ namespace GoLib
         private IEnumerable<StoneGroup> GroupNeighbors(Stone stone, bool sameColor = false)
         {
             var groups = new HashSet<StoneGroup>();
-            foreach (var neighbor in StoneNeighbors(stone.Point))
+            foreach (var neighbor in StoneNeighbors(stone, sameColor))
             {
-                if (neighbor.Color != Colour.None && (!sameColor || stone.Color == neighbor.Color))
+                if (neighbor != Stone.FAKE)
                 {
-                    groups.Add(_board[neighbor.Point.X, neighbor.Point.Y].stoneGroup);
+                    groups.Add(StoneGroup(neighbor));
                 }
             }
             return groups;
@@ -167,36 +173,51 @@ namespace GoLib
 
         public Move Move(Stone stone)
         {
-            _board[stone.Point.X, stone.Point.Y].stone = stone;
-            AddGroup(stone);
-
-            var move = new Move(stone);
-            RemoveNeighborLiberties(move);
+            var move = new Move(stone, Add(stone));
             UpdateKo(move);
             _moves.Add(move);
             return move;
         }
 
+        private HashSet<Stone> Add(Stone stone)
+        {
+            _board[stone.Point.X, stone.Point.Y].stone = stone;
+            AddGroup(stone);
+            return RemoveNeighborLiberties(stone);
+        }
+
         private void UpdateKo(Move move)
         {
-            int x = move.Stone.Point.X;
-            int y = move.Stone.Point.Y;
-            if (_board[x, y].stoneGroup.Stones.Count == 1
-                && _board[x, y].stoneGroup.Liberties.Count == 1
+            if (StoneGroup(move.Stone).Stones.Count == 1
+                && StoneGroup(move.Stone).Liberties.Count == 1
                 && move.Captured.Count == 1)
             {
-                move.Ko = move.Captured[0];
+                move.Ko = move.Captured.First();
             }
         }
 
-        // TODO: improve merge method strategy
         private void AddGroup(Stone stone)
         {
-            var group = new StoneGroup(stone, Liberties(stone));
-            _board[stone.Point.X, stone.Point.Y].stoneGroup = group;
-            foreach (var neighbor in GroupNeighbors(stone, true))
+            var groups = GroupNeighbors(stone, true);
+            StoneGroup group;
+
+            if (groups.Count() == 0)
             {
-                Merge(group, neighbor);
+                group = new StoneGroup(stone, Liberties(stone));
+            }
+            else
+            {
+                group = groups.First();
+                group.Stones.Add(stone);
+                group.Liberties.UnionWith(Liberties(stone));
+            }
+            _board[stone.Point.X, stone.Point.Y].stoneGroup = group;
+            foreach (var neighbor in groups)
+            {
+                if (neighbor != group)
+                {
+                    Merge(group, neighbor);
+                }
             }
         }
 
@@ -209,30 +230,68 @@ namespace GoLib
             }
         }
 
-        private void RemoveNeighborLiberties(Move move)
+        private HashSet<Stone> RemoveNeighborLiberties(Stone stone)
         {
-            foreach (var neighbor in GroupNeighbors(move.Stone))
+            var captured = new HashSet<Stone>();
+            foreach (var neighbor in GroupNeighbors(stone))
             {
-                neighbor.Liberties.Remove(move.Stone.Point);
-                if (neighbor.Liberties.Count == 0 && neighbor.Color != move.Stone.Color)
+                neighbor.Liberties.Remove(stone.Point);
+                if (neighbor.Liberties.Count == 0 && neighbor.Color != stone.Color)
                 {
-                    Capture(neighbor, move);
+                    Capture(neighbor);
+                    captured.UnionWith(neighbor.Stones);
                 }
             }
+            return captured;
         }
 
-        private void Capture(StoneGroup group, Move move)
+        private void Capture(StoneGroup group)
         {
             foreach (var stone in group.Stones)
             {
-                addNeighborLiberties(stone);
-                move.Captured.Add(stone);
+                AddNeighborLiberties(stone);
                 _board[stone.Point.X, stone.Point.Y].stone = null;
                 _board[stone.Point.X, stone.Point.Y].stoneGroup = null;
             }
         }
 
-        private void addNeighborLiberties(Stone stone)
+        private void Remove(Stone stone)
+        {
+            AddNeighborLiberties(stone);
+            _board[stone.Point.X, stone.Point.Y].stone = null;
+            if (StoneNeighbors(stone, true).Count() > 1)
+            {
+                SplitGroups(stone);
+            }
+            _board[stone.Point.X, stone.Point.Y].stoneGroup = null;
+        }
+
+        private void SplitGroups(Stone stone)
+        {
+            foreach (var neighbor in StoneNeighbors(stone, true))
+            {
+                if (StoneGroup(neighbor) == StoneGroup(stone))
+                {
+                    var group = new StoneGroup(neighbor, Liberties(neighbor));
+                    AddNeighborStone(group, neighbor);
+                }
+            }
+        }
+
+        private void AddNeighborStone(StoneGroup group, Stone stone)
+        {
+            foreach (var neighbor in StoneNeighbors(stone, true))
+            {
+                if (!group.Stones.Contains(neighbor))
+                {
+                    group.Stones.Add(neighbor);
+                    group.Liberties.UnionWith(Liberties(neighbor));
+                    AddNeighborStone(group, neighbor);
+                }
+            }
+        }
+
+        private void AddNeighborLiberties(Stone stone)
         {
             foreach (var neighbor in GroupNeighbors(stone))
             {
@@ -247,6 +306,25 @@ namespace GoLib
         {
             public Stone stone;
             public StoneGroup stoneGroup;
+        }
+
+        public Move Undo()
+        {
+            if (_moves.Count == 0)
+            {
+                return null;
+            }
+            else
+            {
+                var move = _moves[_moves.Count - 1];
+                _moves.Remove(move);
+                Remove(move.Stone);
+                foreach (var captured in move.Captured)
+                {
+                    Add(captured);
+                }
+                return move;
+            }
         }
     }
 }

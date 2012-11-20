@@ -10,6 +10,8 @@ namespace GoLib
         private readonly Colour _color;
         private readonly Point _point;
 
+        public static Stone FAKE = new Stone(Colour.None, new Point(-1, -1));
+
         public Stone(Colour color, Point point)
         {
             _color = color;

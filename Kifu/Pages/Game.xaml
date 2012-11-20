@@ -37,12 +37,17 @@
             <TextBlock x:Name="pageTitle" Grid.Column="1" Text="Jeu de Go" Style="{StaticResource PageHeaderTextStyle}"/>
         </Grid>
 
-        <Canvas x:Name="GobanCanvas" Grid.Row="1" Margin="120,30,0,50" Loaded="GobanCanvas_Loaded" PointerMoved="Canvas_PointerMoved"
+        <Canvas x:Name="gobanCanvas" Grid.Row="1" Margin="120,30,0,50" Loaded="GobanCanvas_Loaded" PointerMoved="Canvas_PointerMoved"
                     PointerReleased="Canvas_PointerReleased">
             <Canvas.Background>
                 <ImageBrush ImageSource="ms-appx:///Assets/Board.png"/>
             </Canvas.Background>
         </Canvas>
+        
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <Button x:Name="passButton" Content="Pass" Click="passButton_Click"/>
+            <Button x:Name="undoButton" Content="Undo" Click="undoButton_Click"/>
+        </StackPanel>
 
         <VisualStateManager.VisualStateGroups>
 

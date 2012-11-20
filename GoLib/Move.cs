@@ -8,13 +8,13 @@ namespace GoLib
     public class Move
     {
         private Stone _stone;
-        private List<Stone> _captured;
+        private HashSet<Stone> _captured;
         private Stone _ko;
 
-        public Move(Stone stone)
+        public Move(Stone stone, HashSet<Stone> captured)
         {
             _stone = stone;
-            _captured = new List<Stone>();
+            _captured = captured;
             _ko = null;
         }
 
@@ -23,7 +23,7 @@ namespace GoLib
             get { return _stone; }
         }
 
-        public List<Stone> Captured
+        public HashSet<Stone> Captured
         {
             get { return _captured; }
         }
