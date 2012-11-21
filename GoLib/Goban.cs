@@ -257,29 +257,31 @@ namespace GoLib
 
         private void Remove(Stone stone)
         {
+            var group = StoneGroup(stone);
             AddNeighborLiberties(stone);
             _board[stone.Point.X, stone.Point.Y].stone = null;
-            if (StoneNeighbors(stone, true).Count() > 1)
-            {
-                SplitGroups(stone);
-            }
             _board[stone.Point.X, stone.Point.Y].stoneGroup = null;
+            SplitGroups(group, stone);
         }
 
-        private void SplitGroups(Stone stone)
+        // Eclate un groupe en plusieurs lorsqu'une pierre de jointure est enlevée du plateau.
+        // Doit également etre appellé en cas de non éclatement, car force un reset des libertés
+        private void SplitGroups(StoneGroup group, Stone stone)
         {
             foreach (var neighbor in StoneNeighbors(stone, true))
             {
-                if (StoneGroup(neighbor) == StoneGroup(stone))
+                if (StoneGroup(neighbor) == group)
                 {
-                    var group = new StoneGroup(neighbor, Liberties(neighbor));
-                    AddNeighborStone(group, neighbor);
+                    var newGroup = new StoneGroup(neighbor, Liberties(neighbor));
+                    AddNeighborStone(newGroup, neighbor);
                 }
             }
         }
 
+        // Ajoute récursivement les pierres adjacente à un groupe
         private void AddNeighborStone(StoneGroup group, Stone stone)
         {
+            _board[stone.Point.X, stone.Point.Y].stoneGroup = group;
             foreach (var neighbor in StoneNeighbors(stone, true))
             {
                 if (!group.Stones.Contains(neighbor))
