@@ -93,7 +93,7 @@ namespace GoLib
             }
         }
 
-        private HashSet<Point> ActualLiberties(Stone stone)
+        public HashSet<Point> ActualLiberties(Stone stone)
         {
             var liberties = new HashSet<Point>(Liberties(stone));
             foreach (var neighbor in GroupNeighbors(stone, true))
@@ -117,7 +117,7 @@ namespace GoLib
             return value;
         }
 
-        private bool isEmpty(Point p)
+        public bool isEmpty(Point p)
         {
             return _board[p.X, p.Y].stone == null;
         }
@@ -135,7 +135,7 @@ namespace GoLib
             yield return new Point(p.X, p.Y - 1);
         }
 
-        private IEnumerable<Stone> StoneNeighbors(Stone stone, bool sameColor = false)
+        public IEnumerable<Stone> StoneNeighbors(Stone stone, bool sameColor = false)
         {
             foreach (var point in Neighbors(stone.Point))
             {
@@ -147,7 +147,7 @@ namespace GoLib
             }
         }
 
-        private IEnumerable<Point> Liberties(Stone stone)
+        public IEnumerable<Point> Liberties(Stone stone)
         {
             foreach (var point in Neighbors(stone.Point))
             {
@@ -158,7 +158,7 @@ namespace GoLib
             }
         }
 
-        private IEnumerable<StoneGroup> GroupNeighbors(Stone stone, bool sameColor = false)
+        public IEnumerable<StoneGroup> GroupNeighbors(Stone stone, bool sameColor = false)
         {
             var groups = new HashSet<StoneGroup>();
             foreach (var neighbor in StoneNeighbors(stone, sameColor))
@@ -310,22 +310,47 @@ namespace GoLib
             public StoneGroup stoneGroup;
         }
 
+        // Retourne le dernier coup joué et annule celui-ci
+        // Si aucun n'a été joué, ou si c'est une passe, retourne null
         public Move Undo()
         {
             if (_moves.Count == 0)
             {
                 return null;
             }
-            else
+
+            var move = _moves.Last();
+            _moves.Remove(move);
+
+            if (move.Stone == Stone.FAKE)
             {
-                var move = _moves[_moves.Count - 1];
-                _moves.Remove(move);
-                Remove(move.Stone);
-                foreach (var captured in move.Captured)
+                return null;
+            }
+
+            Remove(move.Stone);
+            foreach (var captured in move.Captured)
+            {
+                Add(captured);
+            }
+            return move;
+        }
+
+        public void Pass()
+        {
+            _moves.Add(new Move(Stone.FAKE, null));
+        }
+
+        public IEnumerable<Point> AllLiberties()
+        {
+            for (int i = 1; i <= Size; ++i)
+            {
+                for (int j = 1; j <= Size; ++j)
                 {
-                    Add(captured);
+                    if (_board[i,j].stone == null)
+                    {
+                        yield return new Point(i,j);
+                    }
                 }
-                return move;
             }
         }
     }

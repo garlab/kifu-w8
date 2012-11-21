@@ -115,6 +115,23 @@ namespace Kifu.Pages
                 {
                     undraw(captured);
                 }
+                // TODO: remove this shity test code
+                if (_goban.CurrentColour == Colour.White)
+                {
+                    AI.WeakAI ai = new AI.WeakAI(_goban, Colour.White);
+                    var next = ai.NextStone();
+                    if (next == null)
+                        _goban.Pass();
+                    else
+                    {
+                        var m = _goban.Move(next);
+                        draw(next);
+                        foreach (var c in m.Captured)
+                        {
+                            undraw(c);
+                        }
+                    }
+                }
             }
         }
 
@@ -161,7 +178,12 @@ namespace Kifu.Pages
 
         private void passButton_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Pass feature
+            var lastMove = _goban.Moves.Last();
+            if (lastMove != null && lastMove.Stone == Stone.FAKE)
+            {
+                // TODO: passer en mode selection des pierres
+            }
+            _goban.Pass();
         }
 
         private void undoButton_Click(object sender, RoutedEventArgs e)

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace GoLib
 {
-    class StoneGroup
+    public class StoneGroup
     {
         private HashSet<Stone> _stones;
         private HashSet<Point> _liberties;

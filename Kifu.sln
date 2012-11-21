@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kifu", "Kifu\Kifu.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoLib", "GoLib\GoLib.csproj", "{64640F62-94C9-4FF7-96EB-DF74294AC606}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AI", "AI\AI.csproj", "{147175BA-477E-4FC2-89B3-D126ECC1DDDE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,16 @@ Global
 		{64640F62-94C9-4FF7-96EB-DF74294AC606}.Release|ARM.ActiveCfg = Release|Any CPU
 		{64640F62-94C9-4FF7-96EB-DF74294AC606}.Release|x64.ActiveCfg = Release|Any CPU
 		{64640F62-94C9-4FF7-96EB-DF74294AC606}.Release|x86.ActiveCfg = Release|Any CPU
+		{147175BA-477E-4FC2-89B3-D126ECC1DDDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{147175BA-477E-4FC2-89B3-D126ECC1DDDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{147175BA-477E-4FC2-89B3-D126ECC1DDDE}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{147175BA-477E-4FC2-89B3-D126ECC1DDDE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{147175BA-477E-4FC2-89B3-D126ECC1DDDE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{147175BA-477E-4FC2-89B3-D126ECC1DDDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{147175BA-477E-4FC2-89B3-D126ECC1DDDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{147175BA-477E-4FC2-89B3-D126ECC1DDDE}.Release|ARM.ActiveCfg = Release|Any CPU
+		{147175BA-477E-4FC2-89B3-D126ECC1DDDE}.Release|x64.ActiveCfg = Release|Any CPU
+		{147175BA-477E-4FC2-89B3-D126ECC1DDDE}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -101,6 +101,10 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
+    <ProjectReference Include="..\AI\AI.csproj">
+      <Project>{147175ba-477e-4fc2-89b3-d126ecc1ddde}</Project>
+      <Name>AI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GoLib\GoLib.csproj">
       <Project>{64640f62-94c9-4ff7-96eb-df74294ac606}</Project>
       <Name>GoLib</Name>
