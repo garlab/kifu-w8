@@ -141,7 +141,7 @@ namespace AI
             yield return new Point(4, 4);
             yield return new Point(4, _goban.Size - 4);
             yield return new Point(_goban.Size - 4, 4);
-            yield return new Point(_goban.Size - 4, _goban.Size - 4);
+            yield return new Point(_goban.Size - 3, _goban.Size - 3);
         }
     }
 }

@@ -20,7 +20,7 @@ using GoLib;
 
 namespace Kifu.Pages
 {
-    enum Game
+    enum GameState
     {
         Ongoing, StoneSelection, Finished
     }
@@ -33,7 +33,7 @@ namespace Kifu.Pages
         private double _size;
         private Goban _goban;
         private Image[,] _stones;
-        private Game _game = Game.Ongoing;
+        private GameState _game = GameState.Ongoing;
 
         public Game()
         {
@@ -103,12 +103,9 @@ namespace Kifu.Pages
         {
             switch (_game)
             {
-                case Game.Ongoing:
-
+                case GameState.Ongoing:
                     var point = Convert(e.GetCurrentPoint(gobanCanvas).Position);
-
-                    Stone stone = new Stone(_goban.CurrentColour, point);
-
+                    var stone = new Stone(_goban.CurrentColour, point);
                     if (_goban.isMoveValid(stone))
                     {
                         Move move = _goban.Move(stone);
@@ -117,25 +114,29 @@ namespace Kifu.Pages
                         {
                             undraw(captured);
                         }
-                        // TODO: remove this call
-                        IAMove();
+                        IAMove(); // TODO: remove this call
                     }
                     break;
-                case Game.Ongoing:
+                case GameState.StoneSelection:
+					
                     break;
+				default:
+					break;
             }
         }
 
+		// TODO: disable passButton if game state != Ongoing
         private void passButton_Click(object sender, RoutedEventArgs e)
         {
             var lastMove = _goban.Moves.Last();
             if (lastMove != null && lastMove.Stone == Stone.FAKE)
             {
-                // TODO: passer en mode selection des pierres
+                _game = GameState.StoneSelection;
             }
             _goban.Pass();
         }
 
+		// TODO: disable if state == Finish
         private void undoButton_Click(object sender, RoutedEventArgs e)
         {
             Move undo = _goban.Undo();
@@ -147,6 +148,7 @@ namespace Kifu.Pages
                     draw(captured);
                 }
             }
+			_game = GameState.Ongoing;
         }
 
         #endregion
