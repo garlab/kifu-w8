@@ -35,6 +35,7 @@ namespace GoLib
         private Colour _first;
         private Section[,] _board;
         private List<Move> _moves;
+        private List<Territory> _territories;
 
         public Goban(int size, Colour first)
         {
@@ -42,6 +43,7 @@ namespace GoLib
             _first = first;
             _board = new Section[size + 2, size + 2];
             _moves = new List<Move>();
+            _territories = new List<Territory>();
             Sentinels(size);
         }
 
@@ -304,10 +306,34 @@ namespace GoLib
             }
         }
 
+        public void ComputeTerritories()
+        {
+            _territories.Clear();
+            foreach (var liberty in AllLiberties())
+            {
+                // TODO: finir
+            }
+        }
+
+        public IEnumerable<Point> AllLiberties()
+        {
+            for (int i = 1; i <= Size; ++i)
+            {
+                for (int j = 1; j <= Size; ++j)
+                {
+                    if (_board[i, j].stone == null)
+                    {
+                        yield return new Point(i, j);
+                    }
+                }
+            }
+        }
+
         private struct Section
         {
             public Stone stone;
             public StoneGroup stoneGroup;
+            public Territory territory;
         }
 
         // Retourne le dernier coup joué et annule celui-ci
@@ -339,23 +365,5 @@ namespace GoLib
         {
             _moves.Add(new Move(Stone.FAKE, null));
         }
-
-        #region IA methods
-
-        public IEnumerable<Point> AllLiberties()
-        {
-            for (int i = 1; i <= Size; ++i)
-            {
-                for (int j = 1; j <= Size; ++j)
-                {
-                    if (_board[i,j].stone == null)
-                    {
-                        yield return new Point(i,j);
-                    }
-                }
-            }
-        }
-
-        #endregion
     }
 }

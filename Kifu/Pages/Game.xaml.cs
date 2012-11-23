@@ -34,12 +34,14 @@ namespace Kifu.Pages
         private Goban _goban;
         private Image[,] _stones;
         private GameState _game = GameState.Ongoing;
+        private Colour _ia;
 
         public Game()
         {
             this.InitializeComponent();
             _goban = new Goban(19, Colour.Black);
             _stones = new Image[19, 19];
+            _ia = Colour.White;
         }
 
         /// <summary>
@@ -72,25 +74,58 @@ namespace Kifu.Pages
             DrawGrid();
         }
 
+        #region Actions
+
         private void IAMove()
         {
-            if (_goban.CurrentColour == Colour.White)
+            if (_goban.CurrentColour == _ia)
             {
+                var lastMove = _goban.Moves.Last();
+                if (lastMove != null && lastMove.Stone == Stone.FAKE)
+                {
+                    Pass(); // L'IA passe toujours lorsque le joueur passe
+                    return;
+                }
                 AI.WeakAI ai = new AI.WeakAI(_goban, Colour.White);
                 var next = ai.NextStone();
                 if (next == null)
-                    _goban.Pass();
+                    Pass();
                 else
                 {
-                    var m = _goban.Move(next);
-                    draw(next);
-                    foreach (var c in m.Captured)
-                    {
-                        undraw(c);
-                    }
+                    Move(next);
                 }
             }
         }
+
+        private void Move(Stone stone)
+        {
+            if (_goban.isMoveValid(stone))
+            {
+                Move move = _goban.Move(stone);
+                draw(stone);
+                foreach (var captured in move.Captured)
+                {
+                    undraw(captured);
+                }
+            }
+        }
+
+        private void Pass()
+        {
+            var lastMove = _goban.Moves.Last();
+            if (lastMove != null && lastMove.Stone == Stone.FAKE)
+            {
+                _game = GameState.StoneSelection;
+            }
+            _goban.Pass();
+        }
+
+        private void MarkGroup(GoLib.Point point)
+        {
+            // TODO: Mark a group as dead or not (during stoneSelection phase)
+        }
+
+        #endregion
 
         #region events
 
@@ -101,42 +136,29 @@ namespace Kifu.Pages
 
         private void Canvas_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
+            var point = Convert(e.GetCurrentPoint(gobanCanvas).Position);
             switch (_game)
             {
                 case GameState.Ongoing:
-                    var point = Convert(e.GetCurrentPoint(gobanCanvas).Position);
                     var stone = new Stone(_goban.CurrentColour, point);
-                    if (_goban.isMoveValid(stone))
-                    {
-                        Move move = _goban.Move(stone);
-                        draw(stone);
-                        foreach (var captured in move.Captured)
-                        {
-                            undraw(captured);
-                        }
-                        IAMove(); // TODO: remove this call
-                    }
+                    Move(stone);
+                    IAMove();
                     break;
                 case GameState.StoneSelection:
-					
+                    MarkGroup(point);
                     break;
-				default:
-					break;
+                default:
+                    break;
             }
         }
 
-		// TODO: disable passButton if game state != Ongoing
+        // TODO: disable passButton if game state != Ongoing
         private void passButton_Click(object sender, RoutedEventArgs e)
         {
-            var lastMove = _goban.Moves.Last();
-            if (lastMove != null && lastMove.Stone == Stone.FAKE)
-            {
-                _game = GameState.StoneSelection;
-            }
-            _goban.Pass();
+            Pass();
         }
 
-		// TODO: disable if state == Finish
+        // TODO: disable if state == Finish
         private void undoButton_Click(object sender, RoutedEventArgs e)
         {
             Move undo = _goban.Undo();
@@ -148,7 +170,7 @@ namespace Kifu.Pages
                     draw(captured);
                 }
             }
-			_game = GameState.Ongoing;
+            _game = GameState.Ongoing;
         }
 
         #endregion
