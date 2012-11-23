@@ -134,6 +134,7 @@
   <ItemGroup>
     <Content Include="Assets\Board.png" />
     <Content Include="Assets\Logo.png" />
+    <Content Include="Assets\LogoBadge.png" />
     <Content Include="Assets\SmallLogo.png" />
     <Content Include="Assets\SplashScreen.png" />
     <Content Include="Assets\StoneBlack.png" />

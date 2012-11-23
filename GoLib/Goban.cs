@@ -47,7 +47,7 @@ namespace GoLib
 
         private void Sentinels(int size)
         {
-            for (int i = 1; i < size - 1; ++i)
+            for (int i = 1; i < size + 1; ++i)
             {
                 _board[0, i].stone = Stone.FAKE;
                 _board[i, 0].stone = Stone.FAKE;
@@ -340,6 +340,8 @@ namespace GoLib
             _moves.Add(new Move(Stone.FAKE, null));
         }
 
+        #region IA methods
+
         public IEnumerable<Point> AllLiberties()
         {
             for (int i = 1; i <= Size; ++i)
@@ -353,5 +355,7 @@ namespace GoLib
                 }
             }
         }
+
+        #endregion
     }
 }

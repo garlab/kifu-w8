@@ -20,6 +20,11 @@ using GoLib;
 
 namespace Kifu.Pages
 {
+    enum Game
+    {
+        Ongoing, StoneSelection, Finished
+    }
+
     /// <summary>
     /// Page de base qui inclut des caractéristiques communes à la plupart des applications.
     /// </summary>
@@ -28,6 +33,7 @@ namespace Kifu.Pages
         private double _size;
         private Goban _goban;
         private Image[,] _stones;
+        private Game _game = Game.Ongoing;
 
         public Game()
         {
@@ -66,6 +72,87 @@ namespace Kifu.Pages
             DrawGrid();
         }
 
+        private void IAMove()
+        {
+            if (_goban.CurrentColour == Colour.White)
+            {
+                AI.WeakAI ai = new AI.WeakAI(_goban, Colour.White);
+                var next = ai.NextStone();
+                if (next == null)
+                    _goban.Pass();
+                else
+                {
+                    var m = _goban.Move(next);
+                    draw(next);
+                    foreach (var c in m.Captured)
+                    {
+                        undraw(c);
+                    }
+                }
+            }
+        }
+
+        #region events
+
+        private void Canvas_PointerMoved(object sender, PointerRoutedEventArgs e)
+        {
+
+        }
+
+        private void Canvas_PointerReleased(object sender, PointerRoutedEventArgs e)
+        {
+            switch (_game)
+            {
+                case Game.Ongoing:
+
+                    var point = Convert(e.GetCurrentPoint(gobanCanvas).Position);
+
+                    Stone stone = new Stone(_goban.CurrentColour, point);
+
+                    if (_goban.isMoveValid(stone))
+                    {
+                        Move move = _goban.Move(stone);
+                        draw(stone);
+                        foreach (var captured in move.Captured)
+                        {
+                            undraw(captured);
+                        }
+                        // TODO: remove this call
+                        IAMove();
+                    }
+                    break;
+                case Game.Ongoing:
+                    break;
+            }
+        }
+
+        private void passButton_Click(object sender, RoutedEventArgs e)
+        {
+            var lastMove = _goban.Moves.Last();
+            if (lastMove != null && lastMove.Stone == Stone.FAKE)
+            {
+                // TODO: passer en mode selection des pierres
+            }
+            _goban.Pass();
+        }
+
+        private void undoButton_Click(object sender, RoutedEventArgs e)
+        {
+            Move undo = _goban.Undo();
+            if (undo != null)
+            {
+                undraw(undo.Stone);
+                foreach (var captured in undo.Captured)
+                {
+                    draw(captured);
+                }
+            }
+        }
+
+        #endregion
+
+        #region draw methods
+
         private void DrawGrid()
         {
             var black = new Color();
@@ -93,45 +180,6 @@ namespace Kifu.Pages
                 h.Y2 = _size / (2 * _goban.Size) + (_goban.Size - 1) * _size / _goban.Size;
                 h.Stroke = brush;
                 gobanCanvas.Children.Add(h);
-            }
-        }
-
-        private void Canvas_PointerMoved(object sender, PointerRoutedEventArgs e)
-        {
-
-        }
-
-        private void Canvas_PointerReleased(object sender, PointerRoutedEventArgs e)
-        {
-            var point = Convert(e.GetCurrentPoint(gobanCanvas).Position);
-
-            Stone stone = new Stone(_goban.CurrentColour, point);
-
-            if (_goban.isMoveValid(stone))
-            {
-                Move move = _goban.Move(stone);
-                draw(stone);
-                foreach (var captured in move.Captured)
-                {
-                    undraw(captured);
-                }
-                // TODO: remove this shity test code
-                if (_goban.CurrentColour == Colour.White)
-                {
-                    AI.WeakAI ai = new AI.WeakAI(_goban, Colour.White);
-                    var next = ai.NextStone();
-                    if (next == null)
-                        _goban.Pass();
-                    else
-                    {
-                        var m = _goban.Move(next);
-                        draw(next);
-                        foreach (var c in m.Captured)
-                        {
-                            undraw(c);
-                        }
-                    }
-                }
             }
         }
 
@@ -176,27 +224,6 @@ namespace Kifu.Pages
             return image;
         }
 
-        private void passButton_Click(object sender, RoutedEventArgs e)
-        {
-            var lastMove = _goban.Moves.Last();
-            if (lastMove != null && lastMove.Stone == Stone.FAKE)
-            {
-                // TODO: passer en mode selection des pierres
-            }
-            _goban.Pass();
-        }
-
-        private void undoButton_Click(object sender, RoutedEventArgs e)
-        {
-            Move undo = _goban.Undo();
-            if (undo != null)
-            {
-                undraw(undo.Stone);
-                foreach (var captured in undo.Captured)
-                {
-                    draw(captured);
-                }
-            }
-        }
+        #endregion
     }
 }

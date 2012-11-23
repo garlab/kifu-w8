@@ -10,12 +10,6 @@ namespace GoLib
         private readonly int _x;
         private readonly int _y;
 
-        public Point()
-        {
-            _x = -1;
-            _y = -1;
-        }
-
         public Point(int x, int y)
         {
             _x = x;
