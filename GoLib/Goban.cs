@@ -7,7 +7,7 @@ namespace GoLib
 {
     public enum Colour
     {
-        None, Black, White
+        None, Black, White, Shared
     }
 
     public static class ColorExtension
@@ -71,6 +71,11 @@ namespace GoLib
         public List<Move> Moves
         {
             get { return _moves; }
+        }
+
+        public List<Territory> Territories
+        {
+            get { return _territories; }
         }
 
         public Colour CurrentColour
@@ -306,14 +311,82 @@ namespace GoLib
             }
         }
 
-        public void ComputeTerritories()
+        #region Territories
+
+        public void EraseTerritories()
         {
             _territories.Clear();
-            foreach (var liberty in AllLiberties())
+            for (int i = 0; i < _size + 2; ++i)
             {
-                // TODO: finir
+                for (int j = 0; j < _size + 2; ++j)
+                {
+                    _board[i,j].territory = null;
+                }
             }
         }
+
+        // Must be call only once
+        public void ComputeTerritories()
+        {
+            foreach (var liberty in AllLiberties())
+            {
+                int x = liberty.X;
+                int y = liberty.Y;
+                if (_board[x - 1, y].territory == null)
+                {
+                    if (_board[x, y - 1].territory == null)
+                    {
+                        var territory = new Territory(liberty);
+                        _territories.Add(territory);
+                        _board[x, y].territory = territory;
+                        AddOwner(territory, liberty);
+                    }
+                    else
+                    {
+                        _board[x, y].territory = _board[x, y - 1].territory;
+                        _board[x, y].territory.Points.Add(liberty);
+                        AddOwner(_board[x, y].territory, liberty);
+                    }
+                }
+                else
+                {
+                    if (_board[x, y - 1].territory == null)
+                    {
+                        _board[x, y].territory = _board[x - 1, y].territory;
+                        _board[x, y].territory.Points.Add(liberty);
+                        AddOwner(_board[x, y].territory, liberty);
+                    }
+                    else
+                    {
+                        _board[x, y].territory = _board[x, y - 1].territory;
+                        _board[x, y].territory.Points.Add(liberty);
+                        AddOwner(_board[x, y].territory, liberty);
+                        Merge(_board[x, y].territory, _board[x - 1, y].territory);
+                    }
+                }
+            }
+        }
+
+        private void Merge(Territory territory, Territory toMerge)
+        {
+            territory.Points.UnionWith(toMerge.Points);
+            territory.Add(toMerge.Color);
+            foreach (var point in toMerge.Points)
+            {
+                _board[point.X, point.Y].territory = territory;
+            }
+            _territories.Remove(toMerge);
+        }
+
+        private void AddOwner(Territory territory, Point liberty)
+        {
+            foreach (var neighbor in StoneNeighbors(new Stone(Colour.None, liberty)))
+            {
+                territory.Add(neighbor.Color);
+            }
+        }
+
+        #endregion
 
         public IEnumerable<Point> AllLiberties()
         {

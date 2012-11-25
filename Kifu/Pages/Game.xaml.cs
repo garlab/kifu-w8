@@ -33,15 +33,26 @@ namespace Kifu.Pages
         private double _size;
         private Goban _goban;
         private Image[,] _stones;
+        private Rectangle[,] _territories;
         private GameState _game = GameState.Ongoing;
         private Colour _ia;
+        private readonly Color _black;
+        private readonly Color _white;
 
         public Game()
         {
+            int size = 19; // TODO: utiliser une taille paramétrable par l'utilisateur
             this.InitializeComponent();
-            _goban = new Goban(19, Colour.Black);
-            _stones = new Image[19, 19];
+            _goban = new Goban(size, Colour.Black);
+            _stones = new Image[size, size];
+            _territories = new Rectangle[size, size];
             _ia = Colour.White;
+
+            _black = new Color();
+            _white = new Color();
+            _black.A = _white.A = 255;
+            _black.R = _black.G = _black.B = 0;
+            _white.R = _white.G = _white.B = 255;
         }
 
         /// <summary>
@@ -72,7 +83,67 @@ namespace Kifu.Pages
             _size = gobanCanvas.ActualWidth > gobanCanvas.ActualHeight ? gobanCanvas.ActualHeight : gobanCanvas.ActualWidth;
             gobanCanvas.Width = gobanCanvas.Height = _size;
             DrawGrid();
+            //tmp();
         }
+
+        public void tmp()
+        {
+            var terr = new Territory(new GoLib.Point(5,5));
+            terr.Points.Add(new GoLib.Point(5, 6));
+            terr.Points.Add(new GoLib.Point(5, 7));
+            terr.Points.Add(new GoLib.Point(6, 6));
+            terr.Add(Colour.Black);
+
+            DrawTerritory(terr);
+        }
+
+        #region events
+
+        private void Canvas_PointerMoved(object sender, PointerRoutedEventArgs e)
+        {
+
+        }
+
+        private void Canvas_PointerReleased(object sender, PointerRoutedEventArgs e)
+        {
+            var point = Convert(e.GetCurrentPoint(gobanCanvas).Position);
+            switch (_game)
+            {
+                case GameState.Ongoing:
+                    Move(new Stone(_goban.CurrentColour, point));
+                    IAMove();
+                    break;
+                case GameState.StoneSelection:
+                    MarkGroup(point);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // TODO: disable passButton if game state != Ongoing
+        private void passButton_Click(object sender, RoutedEventArgs e)
+        {
+            Pass();
+            IAMove();
+        }
+
+        // TODO: disable if state == Finish
+        private void undoButton_Click(object sender, RoutedEventArgs e)
+        {
+            switch (_game)
+            {
+                case GameState.Ongoing:
+                    Undo();
+                    break;
+                case GameState.StoneSelection:
+                    _game = GameState.Ongoing;
+                    EraseTerritories();
+                    break;
+            }
+        }
+
+        #endregion
 
         #region Actions
 
@@ -102,10 +173,10 @@ namespace Kifu.Pages
             if (_goban.isMoveValid(stone))
             {
                 Move move = _goban.Move(stone);
-                draw(stone);
+                Draw(stone);
                 foreach (var captured in move.Captured)
                 {
-                    undraw(captured);
+                    Undraw(captured);
                 }
             }
         }
@@ -116,61 +187,52 @@ namespace Kifu.Pages
             if (lastMove != null && lastMove.Stone == Stone.FAKE)
             {
                 _game = GameState.StoneSelection;
+                DrawTerritories();
             }
             _goban.Pass();
         }
 
-        private void MarkGroup(GoLib.Point point)
-        {
-            // TODO: Mark a group as dead or not (during stoneSelection phase)
-        }
-
-        #endregion
-
-        #region events
-
-        private void Canvas_PointerMoved(object sender, PointerRoutedEventArgs e)
-        {
-
-        }
-
-        private void Canvas_PointerReleased(object sender, PointerRoutedEventArgs e)
-        {
-            var point = Convert(e.GetCurrentPoint(gobanCanvas).Position);
-            switch (_game)
-            {
-                case GameState.Ongoing:
-                    var stone = new Stone(_goban.CurrentColour, point);
-                    Move(stone);
-                    IAMove();
-                    break;
-                case GameState.StoneSelection:
-                    MarkGroup(point);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        // TODO: disable passButton if game state != Ongoing
-        private void passButton_Click(object sender, RoutedEventArgs e)
-        {
-            Pass();
-        }
-
-        // TODO: disable if state == Finish
-        private void undoButton_Click(object sender, RoutedEventArgs e)
+        private void Undo()
         {
             Move undo = _goban.Undo();
             if (undo != null)
             {
-                undraw(undo.Stone);
+                Undraw(undo.Stone);
                 foreach (var captured in undo.Captured)
                 {
-                    draw(captured);
+                    Draw(captured);
                 }
             }
-            _game = GameState.Ongoing;
+        }
+
+        private void MarkGroup(GoLib.Point point)
+        {
+            var g = _goban; // TODO: Mark a group as dead or not (during stoneSelection phase)
+        }
+
+        private void EraseTerritories()
+        {
+            _goban.EraseTerritories();
+            for (int i = 0; i < _goban.Size; ++i)
+            {
+                for (int j = 0; j < _goban.Size; ++j)
+                {
+                    if (_territories[i, j] != null)
+                    {
+                        gobanCanvas.Children.Remove(_territories[i, j]);
+                        _territories[i, j] = null;
+                    }
+                }
+            }
+        }
+
+        public void DrawTerritories()
+        {
+            _goban.ComputeTerritories();
+            foreach (var territory in _goban.Territories)
+            {
+                DrawTerritory(territory);
+            }
         }
 
         #endregion
@@ -179,13 +241,7 @@ namespace Kifu.Pages
 
         private void DrawGrid()
         {
-            var black = new Color();
-            black.A = 255;
-            black.R = 0;
-            black.G = 0;
-            black.B = 0;
-
-            var brush = new SolidColorBrush(black);
+            var brush = new SolidColorBrush(_black);
 
             for (var i = 0; i < _goban.Size; ++i)
             {
@@ -207,7 +263,27 @@ namespace Kifu.Pages
             }
         }
 
-        private void draw(Stone stone)
+        public void DrawTerritory(Territory territory)
+        {
+            double size = _size * 0.4 / _goban.Size;
+            double gap = (_size / _goban.Size - size) / 2;
+            var brush = new SolidColorBrush(Convert(territory.Color));
+
+            foreach (var point in territory.Points)
+            {
+                var rect = new Rectangle();
+                var coord = Convert(point);
+                rect.Width = rect.Height = size;
+                rect.Fill = brush;
+
+                Canvas.SetLeft(rect, coord.X + gap);
+                Canvas.SetTop(rect, coord.Y + gap);
+                gobanCanvas.Children.Add(rect);
+                _territories[point.X - 1, point.Y - 1] = rect;
+            }
+        }
+
+        private void Draw(Stone stone)
         {
             var image = getImage(stone);
             var point = Convert(stone.Point);
@@ -218,10 +294,21 @@ namespace Kifu.Pages
             _stones[stone.Point.X - 1, stone.Point.Y - 1] = image;
         }
 
-        private void undraw(Stone stone)
+        private void Undraw(Stone stone)
         {
             var image = _stones[stone.Point.X - 1, stone.Point.Y - 1];
             gobanCanvas.Children.Remove(image);
+        }
+
+        #endregion
+
+        #region Conversions
+
+        // TODO: remplacer les conversions par un méchanisme plus propre
+
+        private Color Convert(Colour colour)
+        {
+            return colour == Colour.Black ? _black : _white;
         }
 
         public GoLib.Point Convert(Windows.Foundation.Point p)
