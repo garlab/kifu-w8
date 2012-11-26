@@ -36,8 +36,9 @@ namespace Kifu.Pages
         private Rectangle[,] _territories;
         private GameState _game = GameState.Ongoing;
         private Colour _ia;
-        private readonly Color _black;
-        private readonly Color _white;
+        private Color _black;
+        private Color _white;
+        private Color _shared;
 
         public Game()
         {
@@ -51,8 +52,12 @@ namespace Kifu.Pages
             _black = new Color();
             _white = new Color();
             _black.A = _white.A = 255;
-            _black.R = _black.G = _black.B = 0;
+            //_black.R = _black.G = _black.B = 0;
             _white.R = _white.G = _white.B = 255;
+            _shared = new Color();
+            _shared.A = 255;
+            _shared.R = 255;
+            _shared.G = _shared.B = 120;
         }
 
         /// <summary>
@@ -92,7 +97,7 @@ namespace Kifu.Pages
             terr.Points.Add(new GoLib.Point(5, 6));
             terr.Points.Add(new GoLib.Point(5, 7));
             terr.Points.Add(new GoLib.Point(6, 6));
-            terr.Add(Colour.Black);
+            //terr.Add(Colour.Black);
 
             DrawTerritory(terr);
         }
@@ -207,7 +212,9 @@ namespace Kifu.Pages
 
         private void MarkGroup(GoLib.Point point)
         {
-            var g = _goban; // TODO: Mark a group as dead or not (during stoneSelection phase)
+            var group = _goban.StoneGroup(new Stone(Colour.None, point));
+            group.Alive = !group.Alive;
+            Refresh();
         }
 
         private void EraseTerritories()
@@ -238,6 +245,19 @@ namespace Kifu.Pages
         #endregion
 
         #region draw methods
+
+        private void Refresh()
+        {
+            foreach (var territory in _goban.Territories)
+            {
+                var color = Convert(territory.Color);
+                var p = territory.Points.First();
+                foreach (var point in territory.Points)
+                {
+                    // TODO: finir ui update
+                }
+            }
+        }
 
         private void DrawGrid()
         {
@@ -308,7 +328,7 @@ namespace Kifu.Pages
 
         private Color Convert(Colour colour)
         {
-            return colour == Colour.Black ? _black : _white;
+            return colour == Colour.Black ? _black : colour == Colour.White ? _white : _shared;
         }
 
         public GoLib.Point Convert(Windows.Foundation.Point p)
@@ -329,7 +349,7 @@ namespace Kifu.Pages
         {
             var image = new Image();
             image.Width = image.Height = _size / _goban.Size;
-            //image.Opacity = 150;
+            image.Opacity = alpha ? 0.5 : 1;
             var uri = stone.Color == Colour.Black ? "ms-appx:///Assets/StoneBlack.png" : "ms-appx:///Assets/StoneWhite.png";
             image.Source = new BitmapImage(new Uri(uri));
             return image;

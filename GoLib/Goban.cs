@@ -7,7 +7,7 @@ namespace GoLib
 {
     public enum Colour
     {
-        None, Black, White, Shared
+        None = 0, Black = 1, White = 2, Shared = 3
     }
 
     public static class ColorExtension
@@ -83,7 +83,7 @@ namespace GoLib
             get { return Round % 2 == 0 ? _first : _first.OpponentColor(); }
         }
 
-        private StoneGroup StoneGroup(Stone stone)
+        public StoneGroup StoneGroup(Stone stone)
         {
             return _board[stone.Point.X, stone.Point.Y].stoneGroup;
         }
@@ -369,24 +369,35 @@ namespace GoLib
 
         private void Merge(Territory territory, Territory toMerge)
         {
-            territory.Points.UnionWith(toMerge.Points);
-            territory.Add(toMerge.Color);
-            foreach (var point in toMerge.Points)
+            if (territory != toMerge)
             {
-                _board[point.X, point.Y].territory = territory;
+                territory.Merge(toMerge);
+                foreach (var point in toMerge.Points)
+                {
+                    _board[point.X, point.Y].territory = territory;
+                }
+                _territories.Remove(toMerge);
             }
-            _territories.Remove(toMerge);
         }
 
         private void AddOwner(Territory territory, Point liberty)
         {
             foreach (var neighbor in StoneNeighbors(new Stone(Colour.None, liberty)))
             {
-                territory.Add(neighbor.Color);
+                territory.Add(StoneGroup(neighbor));
             }
         }
 
         #endregion
+
+        public void MarkDead(Point point)
+        {
+            var group = _board[point.X, point.Y].stoneGroup;
+            if (group != null)
+            {
+
+            }
+        }
 
         public IEnumerable<Point> AllLiberties()
         {

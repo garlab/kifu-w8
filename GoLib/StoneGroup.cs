@@ -9,13 +9,17 @@ namespace GoLib
     {
         private HashSet<Stone> _stones;
         private HashSet<Point> _liberties;
+        private HashSet<Territory> _territories;
         private Colour _color;
+        private bool _alive;
 
         public StoneGroup(Stone stone, IEnumerable<Point> liberties)
         {
             _stones = new HashSet<Stone>();
             _liberties = new HashSet<Point>();
+            _territories = new HashSet<Territory>();
             _color = stone.Color;
+            _alive = true;
             Add(stone, liberties);
         }
 
@@ -23,6 +27,21 @@ namespace GoLib
         {
             _stones.Add(stone);
             _liberties.UnionWith(liberties);
+        }
+
+        public bool Alive
+        {
+            get { return _alive; }
+            set
+            {
+                if (_alive == value) return;
+                _alive = value;
+                var color = _alive ? Colour.None : _color.OpponentColor();
+                foreach (var territory in _territories)
+                {
+                    territory.Mark = color;
+                }
+            }
         }
 
         public HashSet<Point> Liberties
@@ -33,6 +52,11 @@ namespace GoLib
         public HashSet<Stone> Stones
         {
             get { return _stones; }
+        }
+
+        public HashSet<Territory> Territories
+        {
+            get { return _territories; }
         }
 
         public Colour Color
