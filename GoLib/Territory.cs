@@ -12,6 +12,14 @@ namespace GoLib
         private Colour _color;
         private Colour _marked;
 
+        public static event EventHandler Changed;
+
+        protected void OnChanged(EventArgs e)
+        {
+            if (Changed != null)
+                Changed(this, e);
+        }
+
         public Territory(Point point)
         {
             _points = new HashSet<Point>();
@@ -43,6 +51,7 @@ namespace GoLib
                 {
                     group.Alive = value == Colour.None || group.Color == value;
                 }
+                OnChanged(EventArgs.Empty);
             }
         }
 

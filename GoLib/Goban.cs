@@ -394,7 +394,7 @@ namespace GoLib
             var group = _board[point.X, point.Y].stoneGroup;
             if (group != null)
             {
-                // TODO
+                group.Alive = !group.Alive;
             }
         }
 

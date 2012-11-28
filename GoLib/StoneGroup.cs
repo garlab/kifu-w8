@@ -13,6 +13,14 @@ namespace GoLib
         private Colour _color;
         private bool _alive;
 
+        public static event EventHandler Changed;
+
+        protected void OnChanged(EventArgs e)
+        {
+            if (Changed != null)
+                Changed(this, e);
+        }
+
         public StoneGroup(Stone stone, IEnumerable<Point> liberties)
         {
             _stones = new HashSet<Stone>();
@@ -41,6 +49,7 @@ namespace GoLib
                 {
                     territory.Mark = color;
                 }
+                OnChanged(EventArgs.Empty);
             }
         }
 

@@ -85,21 +85,11 @@ namespace Kifu.Pages
 
         private void GobanCanvas_Loaded(object sender, RoutedEventArgs e)
         {
+            StoneGroup.Changed += StoneGroup_Changed;
+            Territory.Changed += Territory_Changed;
             _size = gobanCanvas.ActualWidth > gobanCanvas.ActualHeight ? gobanCanvas.ActualHeight : gobanCanvas.ActualWidth;
             gobanCanvas.Width = gobanCanvas.Height = _size;
             DrawGrid();
-            //tmp();
-        }
-
-        public void tmp()
-        {
-            var terr = new Territory(new GoLib.Point(5,5));
-            terr.Points.Add(new GoLib.Point(5, 6));
-            terr.Points.Add(new GoLib.Point(5, 7));
-            terr.Points.Add(new GoLib.Point(6, 6));
-            //terr.Add(Colour.Black);
-
-            DrawTerritory(terr);
         }
 
         #region events
@@ -145,6 +135,24 @@ namespace Kifu.Pages
                     _game = GameState.Ongoing;
                     EraseTerritories();
                     break;
+            }
+        }
+
+        private void Territory_Changed(object sender, EventArgs e)
+        {
+            var territory = sender as Territory;
+            if (territory != null)
+            {
+                // TODO: mettre à jour l'affichage
+            }
+        }
+
+        private void StoneGroup_Changed(object sender, EventArgs e)
+        {
+            var group = sender as StoneGroup;
+            if (group != null)
+            {
+                // TODO: mettre à jour l'affichage
             }
         }
 
@@ -212,9 +220,7 @@ namespace Kifu.Pages
 
         private void MarkGroup(GoLib.Point point)
         {
-            var group = _goban.StoneGroup(new Stone(Colour.None, point));
-            group.Alive = !group.Alive;
-            Refresh();
+            _goban.MarkDead(point);
         }
 
         private void EraseTerritories()
@@ -246,6 +252,7 @@ namespace Kifu.Pages
 
         #region draw methods
 
+        // TODO : remove
         private void Refresh()
         {
             foreach (var territory in _goban.Territories)
