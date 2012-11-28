@@ -35,7 +35,6 @@ namespace GoLib
         private Colour _first;
         private Section[,] _board;
         private List<Move> _moves;
-        private List<Territory> _territories;
 
         public Goban(int size, Colour first)
         {
@@ -43,7 +42,6 @@ namespace GoLib
             _first = first;
             _board = new Section[size + 2, size + 2];
             _moves = new List<Move>();
-            _territories = new List<Territory>();
             Sentinels(size);
         }
 
@@ -73,14 +71,35 @@ namespace GoLib
             get { return _moves; }
         }
 
-        public List<Territory> Territories
+        public IEnumerable<Territory> Territories
         {
-            get { return _territories; }
+            get
+            {
+                var territories = new HashSet<Territory>();
+                foreach (var section in _board)
+                {
+                    if (section.territory != null)
+                    {
+                        territories.Add(section.territory);
+                    }
+                }
+                return territories;
+            }
         }
 
         public Colour CurrentColour
         {
             get { return Round % 2 == 0 ? _first : _first.OpponentColor(); }
+        }
+
+        public Stone GetStone(Point point)
+        {
+            return _board[point.X, point.Y].stone;
+        }
+
+        public StoneGroup StoneGroup(Point point)
+        {
+            return _board[point.X, point.Y].stoneGroup;
         }
 
         public StoneGroup StoneGroup(Stone stone)
@@ -92,6 +111,7 @@ namespace GoLib
         {
             if (isEmpty(stone.Point) && !isKo(stone))
             {
+                // Liberties(stone).Count > 0 || GroupNeighbors(stone, true).Any(n => n.Liberties.Count > 1) || GroupNeighbors(stone).Any(n => n.Color == stone.Color.OpponentColor() && n.Liberties.Count == 1)
                 return ActualLiberties(stone).Count > 0 || CaptureValue(stone) > 0;
             }
             else
@@ -113,15 +133,10 @@ namespace GoLib
 
         private int CaptureValue(Stone stone)
         {
-            int value = 0;
-            foreach (StoneGroup neighbor in GroupNeighbors(stone))
-            {
-                if (neighbor.Color == stone.Color.OpponentColor() && neighbor.Liberties.Count == 1)
-                {
-                    value += neighbor.Stones.Count;
-                }
-            }
-            return value;
+            var v = from neighbor in GroupNeighbors(stone)
+                    where neighbor.Color == stone.Color.OpponentColor() && neighbor.Liberties.Count == 1
+                    select neighbor.Stones.Count;
+            return v.Sum();
         }
 
         public bool isEmpty(Point p)
@@ -144,38 +159,27 @@ namespace GoLib
 
         public IEnumerable<Stone> StoneNeighbors(Stone stone, bool sameColor = false)
         {
-            foreach (var point in Neighbors(stone.Point))
-            {
-                var neighbor = _board[point.X, point.Y].stone;
-                if (neighbor != null && (!sameColor || stone.Color == neighbor.Color))
-                {
-                    yield return neighbor;
-                }
-            }
+            var stoneNeighbors = from point in Neighbors(stone.Point)
+                                 let neighbor = _board[point.X, point.Y].stone
+                                 where neighbor != null && (!sameColor || stone.Color == neighbor.Color)
+                                 select neighbor;
+            return stoneNeighbors;
         }
 
         public IEnumerable<Point> Liberties(Stone stone)
         {
-            foreach (var point in Neighbors(stone.Point))
-            {
-                if (_board[point.X, point.Y].stone == null)
-                {
-                    yield return point;
-                }
-            }
+            var liberties = from point in Neighbors(stone.Point)
+                            where _board[point.X, point.Y].stone == null
+                            select point;
+            return liberties;
         }
 
         public IEnumerable<StoneGroup> GroupNeighbors(Stone stone, bool sameColor = false)
         {
-            var groups = new HashSet<StoneGroup>();
-            foreach (var neighbor in StoneNeighbors(stone, sameColor))
-            {
-                if (neighbor != Stone.FAKE)
-                {
-                    groups.Add(StoneGroup(neighbor));
-                }
-            }
-            return groups;
+            var groups = from neighbor in StoneNeighbors(stone, sameColor)
+                         where neighbor != Stone.FAKE
+                         select StoneGroup(neighbor);
+            return groups.Distinct();
         }
 
         public Move Move(Stone stone)
@@ -302,12 +306,10 @@ namespace GoLib
 
         private void AddNeighborLiberties(Stone stone)
         {
-            foreach (var neighbor in GroupNeighbors(stone))
+            var color = stone.Color.OpponentColor();
+            foreach (var neighbor in GroupNeighbors(stone).Where(n => n.Color == color))
             {
-                if (neighbor.Color == stone.Color.OpponentColor())
-                {
-                    neighbor.Liberties.Add(stone.Point);
-                }
+                neighbor.Liberties.Add(stone.Point);
             }
         }
 
@@ -315,12 +317,11 @@ namespace GoLib
 
         public void EraseTerritories()
         {
-            _territories.Clear();
             for (int i = 0; i < _size + 2; ++i)
             {
                 for (int j = 0; j < _size + 2; ++j)
                 {
-                    _board[i,j].territory = null;
+                    _board[i, j].territory = null;
                 }
             }
         }
@@ -337,7 +338,6 @@ namespace GoLib
                     if (_board[x, y - 1].territory == null)
                     {
                         var territory = new Territory(liberty);
-                        _territories.Add(territory);
                         _board[x, y].territory = territory;
                         AddOwner(territory, liberty);
                     }
@@ -376,7 +376,6 @@ namespace GoLib
                 {
                     _board[point.X, point.Y].territory = territory;
                 }
-                _territories.Remove(toMerge);
             }
         }
 
@@ -395,7 +394,7 @@ namespace GoLib
             var group = _board[point.X, point.Y].stoneGroup;
             if (group != null)
             {
-
+                // TODO
             }
         }
 
