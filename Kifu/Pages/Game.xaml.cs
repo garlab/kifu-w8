@@ -143,7 +143,8 @@ namespace Kifu.Pages
             var territory = sender as Territory;
             if (territory != null)
             {
-                // TODO: mettre à jour l'affichage
+                UnDraw(territory);
+                Draw(territory);
             }
         }
 
@@ -152,7 +153,8 @@ namespace Kifu.Pages
             var group = sender as StoneGroup;
             if (group != null)
             {
-                // TODO: mettre à jour l'affichage
+                UnDraw(group);
+                Draw(group);
             }
         }
 
@@ -189,7 +191,7 @@ namespace Kifu.Pages
                 Draw(stone);
                 foreach (var captured in move.Captured)
                 {
-                    Undraw(captured);
+                    UnDraw(captured);
                 }
             }
         }
@@ -210,7 +212,7 @@ namespace Kifu.Pages
             Move undo = _goban.Undo();
             if (undo != null)
             {
-                Undraw(undo.Stone);
+                UnDraw(undo.Stone);
                 foreach (var captured in undo.Captured)
                 {
                     Draw(captured);
@@ -244,27 +246,13 @@ namespace Kifu.Pages
             _goban.ComputeTerritories();
             foreach (var territory in _goban.Territories)
             {
-                DrawTerritory(territory);
+                Draw(territory);
             }
         }
 
         #endregion
 
         #region draw methods
-
-        // TODO : remove
-        private void Refresh()
-        {
-            foreach (var territory in _goban.Territories)
-            {
-                var color = Convert(territory.Color);
-                var p = territory.Points.First();
-                foreach (var point in territory.Points)
-                {
-                    // TODO: finir ui update
-                }
-            }
-        }
 
         private void DrawGrid()
         {
@@ -290,7 +278,7 @@ namespace Kifu.Pages
             }
         }
 
-        public void DrawTerritory(Territory territory)
+        public void Draw(Territory territory)
         {
             double size = _size * 0.4 / _goban.Size;
             double gap = (_size / _goban.Size - size) / 2;
@@ -310,9 +298,34 @@ namespace Kifu.Pages
             }
         }
 
-        private void Draw(Stone stone)
+        public void UnDraw(Territory territory)
         {
-            var image = getImage(stone);
+            foreach (var point in territory.Points)
+            {
+                var rect = _territories[point.X - 1, point.Y - 1];
+                gobanCanvas.Children.Remove(rect);
+            }
+        }
+
+        public void Draw(StoneGroup group)
+        {
+            foreach (var stone in group.Stones)
+            {
+                Draw(stone, group.Alive);
+            }
+        }
+
+        public void UnDraw(StoneGroup group)
+        {
+            foreach (var stone in group.Stones)
+            {
+                UnDraw(stone);
+            }
+        }
+
+        private void Draw(Stone stone, bool alive = true)
+        {
+            var image = getImage(stone, alive);
             var point = Convert(stone.Point);
 
             Canvas.SetTop(image, point.Y);
@@ -321,7 +334,7 @@ namespace Kifu.Pages
             _stones[stone.Point.X - 1, stone.Point.Y - 1] = image;
         }
 
-        private void Undraw(Stone stone)
+        private void UnDraw(Stone stone)
         {
             var image = _stones[stone.Point.X - 1, stone.Point.Y - 1];
             gobanCanvas.Children.Remove(image);
@@ -352,11 +365,11 @@ namespace Kifu.Pages
             return new Windows.Foundation.Point(x, y);
         }
 
-        private Image getImage(Stone stone, bool alpha = false)
+        private Image getImage(Stone stone, bool alive = true)
         {
             var image = new Image();
             image.Width = image.Height = _size / _goban.Size;
-            image.Opacity = alpha ? 0.5 : 1;
+            image.Opacity = alive ? 1 : 0.5;
             var uri = stone.Color == Colour.Black ? "ms-appx:///Assets/StoneBlack.png" : "ms-appx:///Assets/StoneWhite.png";
             image.Source = new BitmapImage(new Uri(uri));
             return image;

@@ -157,7 +157,7 @@ namespace GoLib
             yield return new Point(p.X, p.Y - 1);
         }
 
-        public IEnumerable<Stone> StoneNeighbors(Stone stone, bool sameColor = false)
+        private IEnumerable<Stone> StoneNeighbors(Stone stone, bool sameColor = false)
         {
             var stoneNeighbors = from point in Neighbors(stone.Point)
                                  let neighbor = _board[point.X, point.Y].stone
@@ -381,9 +381,12 @@ namespace GoLib
 
         private void AddOwner(Territory territory, Point liberty)
         {
-            foreach (var neighbor in StoneNeighbors(new Stone(Colour.None, liberty)))
+            foreach (var neighbor in StoneNeighbors(new Stone(Colour.Black, liberty)))
             {
-                territory.Add(StoneGroup(neighbor));
+                if (neighbor != Stone.FAKE)
+                {
+                    territory.Add(StoneGroup(neighbor));
+                }
             }
         }
 
