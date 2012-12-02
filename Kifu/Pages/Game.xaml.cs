@@ -14,6 +14,9 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Shapes;
+using Windows.UI.Xaml.Media.Animation;
+using Windows.UI.ViewManagement;
+using Windows.UI.Core;
 using GoLib;
 
 // Pour en savoir plus sur le modèle d'élément Page de base, consultez la page http://go.microsoft.com/fwlink/?LinkId=234237
@@ -25,25 +28,62 @@ namespace Kifu.Pages
         Ongoing, StoneSelection, Finished
     }
 
-    /// <summary>
-    /// Page de base qui inclut des caractéristiques communes à la plupart des applications.
-    /// </summary>
     public sealed partial class Game : Kifu.Common.LayoutAwarePage
     {
-        private double _size;
         private Goban _goban;
         private Image[,] _stones;
         private Rectangle[,] _territories;
-        private GameState _game = GameState.Ongoing;
+        private GameState _state = GameState.Ongoing;
         private Colour _ia;
         private Color _black;
         private Color _white;
         private Color _shared;
+        private double _wideSize;
+
+        #region properties
+
+        public double GobanSize
+        {
+            get { return gobanCanvas.Height; }
+            set
+            {
+                if (gobanCanvas.Height != value)
+                {
+                    gobanCanvas.Width = gobanCanvas.Height = value;
+                    Clear();
+                    Draw();
+                }
+            }
+        }
+
+        public double SectionSize
+        {
+            get { return GobanSize / _goban.Size; }
+        }
+
+        GameState State
+        {
+            get { return _state; }
+            set
+            {
+                _state = value;
+                this.passButton.IsEnabled = _state == GameState.Ongoing;
+                this.undoButton.IsEnabled = _state != GameState.Finished;
+                this.giveUpButton.IsEnabled = _state != GameState.Finished;
+                this.submitButton.IsEnabled = _state == GameState.StoneSelection;
+            }
+        }
+
+        #endregion
 
         public Game()
         {
             int size = 19; // TODO: utiliser une taille paramétrable par l'utilisateur
             this.InitializeComponent();
+            Window.Current.SizeChanged += Current_SizeChanged;
+            StoneGroup.Changed += StoneGroup_Changed;
+            Territory.Changed += Territory_Changed;
+
             _goban = new Goban(size, Colour.Black);
             _stones = new Image[size, size];
             _territories = new Rectangle[size, size];
@@ -52,7 +92,6 @@ namespace Kifu.Pages
             _black = new Color();
             _white = new Color();
             _black.A = _white.A = 255;
-            //_black.R = _black.G = _black.B = 0;
             _white.R = _white.G = _white.B = 255;
             _shared = new Color();
             _shared.A = 255;
@@ -60,49 +99,42 @@ namespace Kifu.Pages
             _shared.G = _shared.B = 120;
         }
 
-        /// <summary>
-        /// Remplit la page à l'aide du contenu passé lors de la navigation. Tout état enregistré est également
-        /// fourni lorsqu'une page est recréée à partir d'une session antérieure.
-        /// </summary>
-        /// <param name="navigationParameter">Valeur de paramètre passée à
-        /// <see cref="Frame.Navigate(Type, Object)"/> lors de la requête initiale de cette page.
-        /// </param>
-        /// <param name="pageState">Dictionnaire d'état conservé par cette page durant une session
-        /// antérieure. Null lors de la première visite de la page.</param>
         protected override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
         {
         }
 
-        /// <summary>
-        /// Conserve l'état associé à cette page en cas de suspension de l'application ou de la
-        /// suppression de la page du cache de navigation. Les valeurs doivent être conformes aux
-        /// exigences en matière de sérialisation de <see cref="SuspensionManager.SessionState"/>.
-        /// </summary>
-        /// <param name="pageState">Dictionnaire vide à remplir à l'aide de l'état sérialisable.</param>
         protected override void SaveState(Dictionary<String, Object> pageState)
         {
         }
 
-        private void GobanCanvas_Loaded(object sender, RoutedEventArgs e)
-        {
-            StoneGroup.Changed += StoneGroup_Changed;
-            Territory.Changed += Territory_Changed;
-            _size = gobanCanvas.ActualWidth > gobanCanvas.ActualHeight ? gobanCanvas.ActualHeight : gobanCanvas.ActualWidth;
-            gobanCanvas.Width = gobanCanvas.Height = _size;
-            DrawGrid();
-        }
-
         #region events
 
-        private void Canvas_PointerMoved(object sender, PointerRoutedEventArgs e)
+        private void GobanCanvas_Loaded(object sender, RoutedEventArgs e)
         {
+            _wideSize = gobanCanvas.Width = gobanCanvas.Height = Math.Min(gobanCanvas.ActualWidth, gobanCanvas.ActualHeight);
+            DrawGrids();
+            DrawHoshis();
+        }
 
+        private void Current_SizeChanged(object sender, WindowSizeChangedEventArgs e)
+        {
+            switch (ApplicationView.Value)
+            {
+                case ApplicationViewState.Filled:
+                case ApplicationViewState.FullScreenLandscape:
+                case ApplicationViewState.FullScreenPortrait:
+                    GobanSize = _wideSize;
+                    break;
+                case ApplicationViewState.Snapped:
+                    GobanSize = 320;
+                    break;
+            }
         }
 
         private void Canvas_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
             var point = Convert(e.GetCurrentPoint(gobanCanvas).Position);
-            switch (_game)
+            switch (State)
             {
                 case GameState.Ongoing:
                     Move(new Stone(_goban.CurrentColour, point));
@@ -116,26 +148,53 @@ namespace Kifu.Pages
             }
         }
 
-        // TODO: disable passButton if game state != Ongoing
         private void passButton_Click(object sender, RoutedEventArgs e)
         {
             Pass();
             IAMove();
         }
 
-        // TODO: disable if state == Finish
         private void undoButton_Click(object sender, RoutedEventArgs e)
         {
-            switch (_game)
+            switch (State)
             {
                 case GameState.Ongoing:
                     Undo();
                     break;
                 case GameState.StoneSelection:
-                    _game = GameState.Ongoing;
+                    State = GameState.Ongoing;
                     EraseTerritories();
                     break;
             }
+        }
+
+        private void giveUpButton_Click(object sender, RoutedEventArgs e)
+        {
+            State = GameState.Finished;
+            Colour winner = _goban.CurrentColour.OpponentColor();
+            winnerUi.Text = winner.ToString();
+            resultUi.Text = winner.ToString()[0] + "+R";
+        }
+
+        private void submitButton_Click(object sender, RoutedEventArgs e)
+        {
+            State = GameState.Finished;
+            Score score = new Score(_goban);
+            var blackScore = score.Get(Colour.Black);
+            var whiteScore = score.Get(Colour.White);
+            blackScoreUi.Text = blackScore.ToString();
+            whiteScoreUi.Text = whiteScore.ToString();
+            winnerUi.Text = blackScore > whiteScore ? "Black" : "White";
+            resultUi.Text = winnerUi.Text[0] + "+" + Math.Abs(blackScore - whiteScore);
+        }
+
+        private void replayButton_Click(object sender, RoutedEventArgs e)
+        {
+            State = GameState.Ongoing;
+            _goban.Clear();
+            Clear();
+            DrawGrids();
+            DrawHoshis();
         }
 
         private void Territory_Changed(object sender, EventArgs e)
@@ -166,7 +225,7 @@ namespace Kifu.Pages
         {
             if (_goban.CurrentColour == _ia)
             {
-                var lastMove = _goban.Moves.Last();
+                var lastMove = _goban.Moves.Count == 0 ? null : _goban.Moves.Last();
                 if (lastMove != null && lastMove.Stone == Stone.FAKE)
                 {
                     Pass(); // L'IA passe toujours lorsque le joueur passe
@@ -198,10 +257,11 @@ namespace Kifu.Pages
 
         private void Pass()
         {
-            var lastMove = _goban.Moves.Last();
+            var lastMove = _goban.Moves.Count == 0 ? null : _goban.Moves.Last();
             if (lastMove != null && lastMove.Stone == Stone.FAKE)
             {
-                _game = GameState.StoneSelection;
+                State = GameState.StoneSelection;
+                _goban.ComputeTerritories();
                 DrawTerritories();
             }
             _goban.Pass();
@@ -241,69 +301,64 @@ namespace Kifu.Pages
             }
         }
 
-        public void DrawTerritories()
-        {
-            _goban.ComputeTerritories();
-            foreach (var territory in _goban.Territories)
-            {
-                Draw(territory);
-            }
-        }
-
         #endregion
 
         #region draw methods
 
-        private void DrawGrid()
+        public void Clear()
+        {
+            gobanCanvas.Children.Clear();
+            Array.Clear(_territories, 0, _territories.Length);
+            Array.Clear(_stones, 0, _stones.Length);
+        }
+
+        public void Draw()
+        {
+            DrawGrids();
+            DrawHoshis();
+            DrawTerritories();
+            DrawStones();
+        }
+
+        private void DrawGrids()
         {
             var brush = new SolidColorBrush(_black);
 
             for (var i = 0; i < _goban.Size; ++i)
             {
                 var v = new Line();
-                v.X1 = _size / (2 * _goban.Size);
-                v.Y1 = _size / (2 * _goban.Size) + i * _size / _goban.Size;
-                v.X2 = _size / (2 * _goban.Size) + (_goban.Size - 1) * _size / _goban.Size;
-                v.Y2 = v.Y1;
-                v.Stroke = brush;
-                gobanCanvas.Children.Add(v);
-
                 var h = new Line();
-                h.X1 = _size / (2 * _goban.Size) + i * _size / _goban.Size;
-                h.Y1 = _size / (2 * _goban.Size);
-                h.X2 = h.X1;
-                h.Y2 = _size / (2 * _goban.Size) + (_goban.Size - 1) * _size / _goban.Size;
-                h.Stroke = brush;
+                v.X1 = h.Y1 = SectionSize / 2;
+                v.Y1 = v.Y2 = h.X1 = h.X2 = SectionSize * (i + 0.5);
+                v.X2 = h.Y2 = SectionSize * (_goban.Size - 0.5);
+                v.Stroke = h.Stroke = brush;
+                gobanCanvas.Children.Add(v);
                 gobanCanvas.Children.Add(h);
             }
         }
 
-        public void Draw(Territory territory)
+        private void DrawHoshis()
         {
-            double size = _size * 0.4 / _goban.Size;
-            double gap = (_size / _goban.Size - size) / 2;
-            var brush = new SolidColorBrush(Convert(territory.Color));
-
-            foreach (var point in territory.Points)
+            foreach (var point in _goban.Hoshis)
             {
-                var rect = new Rectangle();
-                var coord = Convert(point);
-                rect.Width = rect.Height = size;
-                rect.Fill = brush;
-
-                Canvas.SetLeft(rect, coord.X + gap);
-                Canvas.SetTop(rect, coord.Y + gap);
-                gobanCanvas.Children.Add(rect);
-                _territories[point.X - 1, point.Y - 1] = rect;
+                var hoshiView = HoshiView(point);
+                gobanCanvas.Children.Add(hoshiView);
             }
         }
 
-        public void UnDraw(Territory territory)
+        public void DrawStones()
         {
-            foreach (var point in territory.Points)
+            foreach (var group in _goban.Groups)
             {
-                var rect = _territories[point.X - 1, point.Y - 1];
-                gobanCanvas.Children.Remove(rect);
+                Draw(group);
+            }
+        }
+
+        public void DrawTerritories()
+        {
+            foreach (var territory in _goban.Territories)
+            {
+                Draw(territory);
             }
         }
 
@@ -325,26 +380,76 @@ namespace Kifu.Pages
 
         private void Draw(Stone stone, bool alive = true)
         {
-            var image = getImage(stone, alive);
-            var point = Convert(stone.Point);
-
-            Canvas.SetTop(image, point.Y);
-            Canvas.SetLeft(image, point.X);
-            gobanCanvas.Children.Add(image);
-            _stones[stone.Point.X - 1, stone.Point.Y - 1] = image;
+            var stoneView = StoneView(stone, alive);
+            gobanCanvas.Children.Add(stoneView);
+            _stones[stone.Point.X - 1, stone.Point.Y - 1] = stoneView;
         }
 
         private void UnDraw(Stone stone)
         {
-            var image = _stones[stone.Point.X - 1, stone.Point.Y - 1];
-            gobanCanvas.Children.Remove(image);
+            var stoneView = _stones[stone.Point.X - 1, stone.Point.Y - 1];
+            gobanCanvas.Children.Remove(stoneView);
+            _stones[stone.Point.X - 1, stone.Point.Y - 1] = null;
+        }
+
+        public void Draw(Territory territory)
+        {
+            foreach (var point in territory.Points)
+            {
+                var territoryView = TerritoryView(point, territory.Color);
+                gobanCanvas.Children.Add(territoryView);
+                _territories[point.X - 1, point.Y - 1] = territoryView;
+            }
+        }
+
+        public void UnDraw(Territory territory)
+        {
+            foreach (var point in territory.Points)
+            {
+                var territoryView = _territories[point.X - 1, point.Y - 1];
+                gobanCanvas.Children.Remove(territoryView);
+                _territories[point.X - 1, point.Y - 1] = null;
+            }
+        }
+
+        private Image StoneView(Stone stone, bool alive = true)
+        {
+            var image = new Image();
+            image.Width = image.Height = SectionSize;
+            image.Opacity = alive ? 1 : 0.5;
+            image.Source = new BitmapImage(new Uri("ms-appx:///Assets/Stone" + stone.Color.ToString() + ".png"));
+            Fit(image, Convert(stone.Point));
+            return image;
+        }
+
+        private Rectangle TerritoryView(GoLib.Point point, Colour color)
+        {
+            var rect = new Rectangle();
+            rect.Width = rect.Height = SectionSize * 0.4;
+            rect.Fill = new SolidColorBrush(Convert(color));
+            Fit(rect, Convert(point));
+            return rect;
+        }
+
+        private Ellipse HoshiView(GoLib.Point point)
+        {
+            var hoshi = new Ellipse();
+            hoshi.Width = hoshi.Height = SectionSize * 0.15;
+            hoshi.Fill = new SolidColorBrush(_black);
+            Fit(hoshi, Convert(point));
+            return hoshi;
+        }
+
+        private void Fit(FrameworkElement e, Windows.Foundation.Point point)
+        {
+            double gap = (SectionSize - e.Height) / 2;
+            Canvas.SetLeft(e, point.X + gap);
+            Canvas.SetTop(e, point.Y + gap);
         }
 
         #endregion
 
         #region Conversions
-
-        // TODO: remplacer les conversions par un méchanisme plus propre
 
         private Color Convert(Colour colour)
         {
@@ -353,26 +458,16 @@ namespace Kifu.Pages
 
         public GoLib.Point Convert(Windows.Foundation.Point p)
         {
-            int x = (int)(p.X * _goban.Size / _size) + 1;
-            int y = (int)(p.Y * _goban.Size / _size) + 1;
+            int x = (int)(p.X / SectionSize) + 1;
+            int y = (int)(p.Y / SectionSize) + 1;
             return new GoLib.Point(x, y);
         }
 
         public Windows.Foundation.Point Convert(GoLib.Point p)
         {
-            double x = (p.X - 1) * _size / _goban.Size;
-            double y = (p.Y - 1) * _size / _goban.Size;
+            double x = (p.X - 1) * SectionSize;
+            double y = (p.Y - 1) * SectionSize;
             return new Windows.Foundation.Point(x, y);
-        }
-
-        private Image getImage(Stone stone, bool alive = true)
-        {
-            var image = new Image();
-            image.Width = image.Height = _size / _goban.Size;
-            image.Opacity = alive ? 1 : 0.5;
-            var uri = stone.Color == Colour.Black ? "ms-appx:///Assets/StoneBlack.png" : "ms-appx:///Assets/StoneWhite.png";
-            image.Source = new BitmapImage(new Uri(uri));
-            return image;
         }
 
         #endregion

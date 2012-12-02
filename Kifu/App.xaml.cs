@@ -66,7 +66,7 @@ namespace Kifu
                 // Quand la pile de navigation n'est pas restaurée, accédez à la première page,
                 // puis configurez la nouvelle page en transmettant les informations requises en tant que
                 // paramètre
-                if (!rootFrame.Navigate(typeof(Pages.Game), args.Arguments))
+                if (!rootFrame.Navigate(typeof(Pages.CreateGame), args.Arguments))
                 {
                     throw new Exception("Failed to create initial page");
                 }
