@@ -99,22 +99,22 @@ namespace Kifu.Pages
 
         private void BlackPlayerView_Loaded(object sender, RoutedEventArgs e)
         {
-            BlackPlayerView.SelectedIndex = 1;
+            BlackPlayerView.SelectedIndex = 0;
         }
 
         private void WhitePlayerView_Loaded(object sender, RoutedEventArgs e)
         {
-            WhitePlayerView.SelectedIndex = 1;
+            WhitePlayerView.SelectedIndex = 0;
         }
 
         private void SizeView_Loaded(object sender, RoutedEventArgs e)
         {
-            SizeView.SelectedIndex = 1;
+            SizeView.SelectedIndex = 0;
         }
 
         private void RuleView_Loaded(object sender, RoutedEventArgs e)
         {
-            RuleView.SelectedIndex = 1;
+            RuleView.SelectedIndex = 0;
         }
     }
 }

@@ -43,6 +43,16 @@ namespace GoLib
             _board = new Section[info.Size + 2, info.Size + 2];
             _moves = new List<Move>();
             Sentinels();
+            Handicap2();
+        }
+
+        private void Handicap2()
+        {
+            foreach (var h in Handicaps)
+            {
+                var stone = new Stone(Colour.Black, h);
+                Add(stone);
+            }
         }
 
         private void Sentinels()
@@ -80,8 +90,6 @@ namespace GoLib
             set;
         }
 
-        public int Handicap { get; set; }
-
         public Colour First
         {
             get { return _first; }
@@ -110,6 +118,21 @@ namespace GoLib
                     yield return new Point(high, middle);
                     yield return new Point(middle, high);
                 }
+            }
+        }
+
+        private IEnumerable<Point> Handicaps
+        {
+            get
+            {
+                var hoshis = new List<Point>(Hoshis);
+                if (_info.Handicap >= 1) yield return hoshis[0];
+                if (_info.Handicap >= 2) yield return hoshis[3];
+                if (_info.Handicap >= 3) yield return hoshis[1];
+                if (_info.Handicap >= 4) yield return hoshis[2];
+                if (_info.Handicap >= 6) { yield return hoshis[5]; yield return hoshis[7]; }
+                if (_info.Handicap >= 8) { yield return hoshis[6]; yield return hoshis[8]; }
+                if (_info.Handicap > 4 && _info.Handicap % 2 == 1) yield return hoshis[4];
             }
         }
 

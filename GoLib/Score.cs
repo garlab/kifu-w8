@@ -29,7 +29,7 @@ namespace GoLib
 
         private void ComputeScore()
         {
-            if (_goban.Handicap == 0)
+            if (_goban.Info.Handicap == 0)
             {
                 _score[0].komi = _goban.Rule == Rule.Japanese ? 6.5 : 7.5;
             }
