@@ -56,11 +56,21 @@ namespace Kifu.Pages
         private void BlackPlayerView_SelectionChanged(object sender, RoutedEventArgs e)
         {
             _info.Players[0].IsHuman = IsHuman(BlackPlayerView);
+            if (!_info.Players[0].IsHuman)
+            {
+                _info.Players[1].IsHuman = true;
+                WhitePlayerView.SelectedIndex = 0;
+            }
         }
 
         private void WhitePlayerView_SelectionChanged(object sender, RoutedEventArgs e)
         {
             _info.Players[1].IsHuman = IsHuman(WhitePlayerView);
+            if (!_info.Players[1].IsHuman)
+            {
+                _info.Players[0].IsHuman = true;
+                BlackPlayerView.SelectedIndex = 0;
+            }
         }
 
         private void SizeView_SelectionChanged(object sender, SelectionChangedEventArgs e)
