@@ -33,12 +33,10 @@ namespace Kifu.Pages
         private Goban _goban;
         private Image[,] _stones;
         private Rectangle[,] _territories;
-        private GameState _state = GameState.Ongoing;
-        private Colour _ia;
+        private GameState _state;
         private Color _black;
         private Color _white;
         private Color _shared;
-        private double _wideSize;
 
         #region properties
 
@@ -78,16 +76,11 @@ namespace Kifu.Pages
 
         public Game()
         {
-            int size = 19; // TODO: utiliser une taille paramétrable par l'utilisateur
             this.InitializeComponent();
             Window.Current.SizeChanged += Current_SizeChanged;
             StoneGroup.Changed += StoneGroup_Changed;
             Territory.Changed += Territory_Changed;
-
-            _goban = new Goban(size, Colour.Black);
-            _stones = new Image[size, size];
-            _territories = new Rectangle[size, size];
-            _ia = Colour.White;
+            State = GameState.Ongoing;
 
             _black = new Color();
             _white = new Color();
@@ -99,36 +92,46 @@ namespace Kifu.Pages
             _shared.G = _shared.B = 120;
         }
 
-        protected override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            var info = e.Parameter as GameInfo;
+            if (info != null)
+            {
+                _goban = new Goban(info);
+                _stones = new Image[info.Size, info.Size];
+                _territories = new Rectangle[info.Size, info.Size];
+            }
+        }
+
+        /*
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
         }
 
+        protected override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
+        {
+            if (pageState != null && pageState.ContainsKey("goban"))
+            {
+                //_goban = (Goban)pageState["goban"];
+            }
+        }//*/
+
         protected override void SaveState(Dictionary<String, Object> pageState)
         {
+            //pageState["goban"] = _goban;
         }
 
         #region events
 
         private void GobanCanvas_Loaded(object sender, RoutedEventArgs e)
         {
-            _wideSize = gobanCanvas.Width = gobanCanvas.Height = Math.Min(gobanCanvas.ActualWidth, gobanCanvas.ActualHeight);
-            DrawGrids();
-            DrawHoshis();
+            FitCanvas();
         }
 
         private void Current_SizeChanged(object sender, WindowSizeChangedEventArgs e)
         {
-            switch (ApplicationView.Value)
-            {
-                case ApplicationViewState.Filled:
-                case ApplicationViewState.FullScreenLandscape:
-                case ApplicationViewState.FullScreenPortrait:
-                    GobanSize = _wideSize;
-                    break;
-                case ApplicationViewState.Snapped:
-                    GobanSize = 320;
-                    break;
-            }
+            FitCanvas();
         }
 
         private void Canvas_PointerReleased(object sender, PointerRoutedEventArgs e)
@@ -144,6 +147,21 @@ namespace Kifu.Pages
                     MarkGroup(point);
                     break;
                 default:
+                    break;
+            }
+        }
+
+        private void FitCanvas()
+        {
+            switch (ApplicationView.Value)
+            {
+                case ApplicationViewState.Filled:
+                case ApplicationViewState.FullScreenLandscape:
+                case ApplicationViewState.FullScreenPortrait:
+                    GobanSize = content.ActualHeight;
+                    break;
+                case ApplicationViewState.Snapped:
+                    GobanSize = 320;
                     break;
             }
         }
@@ -223,7 +241,7 @@ namespace Kifu.Pages
 
         private void IAMove()
         {
-            if (_goban.CurrentColour == _ia)
+            if (!_goban.CurrentPlayer.IsHuman)
             {
                 var lastMove = _goban.Moves.Count == 0 ? null : _goban.Moves.Last();
                 if (lastMove != null && lastMove.Stone == Stone.FAKE)
@@ -252,6 +270,7 @@ namespace Kifu.Pages
                 {
                     UnDraw(captured);
                 }
+                undoButton.IsEnabled = true;
             }
         }
 
@@ -265,6 +284,7 @@ namespace Kifu.Pages
                 DrawTerritories();
             }
             _goban.Pass();
+            undoButton.IsEnabled = true;
         }
 
         private void Undo()
@@ -277,6 +297,7 @@ namespace Kifu.Pages
                 {
                     Draw(captured);
                 }
+                undoButton.IsEnabled = _goban.Moves.Count != 0;
             }
         }
 

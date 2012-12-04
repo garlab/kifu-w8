@@ -43,18 +43,39 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Slider Grid.Row="0" Grid.Column="1" x:Name="handicap" Width="100"/>
-            <ComboBox Grid.Row="1" Grid.Column="1" x:Name="SizeView" SelectionChanged="SizeView_SelectionChanged" Width="100">
+
+            <TextBlock Grid.Row="0" Text="Black Player:" FontSize="14"/>
+            <TextBlock Grid.Row="1" Text="White Player:" FontSize="14"/>
+            <TextBlock Grid.Row="2" Text="Board Size:" FontSize="14"/>
+            <TextBlock Grid.Row="3" Text="Rules:" FontSize="14"/>
+            <TextBlock Grid.Row="4" Text="Handicap:" FontSize="14"/>
+
+            <ComboBox Grid.Row="0" Grid.Column="1" Loaded="BlackPlayerView_Loaded" x:Name="BlackPlayerView" SelectionChanged="BlackPlayerView_SelectionChanged" Width="100">
+                <x:String>Human</x:String>
+                <x:String>CPU</x:String>
+            </ComboBox>
+            <ComboBox Grid.Row="1" Grid.Column="1" Loaded="WhitePlayerView_Loaded" x:Name="WhitePlayerView" SelectionChanged="WhitePlayerView_SelectionChanged" Width="100">
+                <x:String>Human</x:String>
+                <x:String>CPU</x:String>
+            </ComboBox>
+            <ComboBox Grid.Row="2" Grid.Column="1" Loaded="SizeView_Loaded" x:Name="SizeView" SelectionChanged="SizeView_SelectionChanged" Width="100">
                 <x:String>19x19</x:String>
                 <x:String>13x13</x:String>
                 <x:String>9x9</x:String>
             </ComboBox>
-            <Button Grid.Row="2" Grid.Column="1" x:Name="playButton" Content="Play" Click="playButton_Click"/>
+            <ComboBox Grid.Row="3" Grid.Column="1" Loaded="RuleView_Loaded" x:Name="RuleView" SelectionChanged="RuleView_SelectionChanged" Width="100">
+                <x:String>Chinese</x:String>
+                <x:String>Japanese</x:String>
+            </ComboBox>
+            <Slider Grid.Row="4" Grid.Column="1" x:Name="HandicapView" ValueChanged="HandicapView_ValueChanged" Minimum="0" Maximum="9" Width="100"/>
+            <Button Grid.Row="5" Grid.Column="1" x:Name="playButton" Content="Play" Click="playButton_Click"/>
         </Grid>
 
         <VisualStateManager.VisualStateGroups>

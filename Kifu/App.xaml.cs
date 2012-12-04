@@ -86,6 +86,7 @@ namespace Kifu
         {
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: enregistrez l'état de l'application et arrêtez toute activité en arrière-plan
+            //await Kifu.Common.SuspensionManager.SaveAsync();
             deferral.Complete();
         }
     }

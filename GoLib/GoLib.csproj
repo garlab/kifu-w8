@@ -36,11 +36,14 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameInfo.cs" />
     <Compile Include="Goban.cs" />
     <Compile Include="History.cs" />
     <Compile Include="Move.cs" />
+    <Compile Include="Player.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Score.cs" />
     <Compile Include="Stone.cs" />
     <Compile Include="StoneGroup.cs" />
     <Compile Include="Territory.cs" />

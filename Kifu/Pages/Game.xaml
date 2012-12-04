@@ -24,7 +24,7 @@
     <Grid Style="{StaticResource LayoutRootStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="140"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition x:Name="content" Height="*"/>
         </Grid.RowDefinitions>
 
         <!-- Back button and page title -->
@@ -48,7 +48,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Grid x:Name="actions" Width="Auto" Height="Auto">
+            <Grid x:Name="actions" Margin="20,20,20,20">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -63,7 +63,7 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Button Grid.Row="0" Grid.Column="0" x:Name="passButton" Content="Pass" Click="passButton_Click" Width="100"/>
-                <Button Grid.Row="0" Grid.Column="1" x:Name="undoButton" Content="Undo" Click="undoButton_Click" Width="100"/>
+                <Button Grid.Row="0" Grid.Column="1" x:Name="undoButton" Content="Undo" Click="undoButton_Click" Width="100" IsEnabled="False"/>
                 <Button Grid.Row="1" Grid.Column="0" x:Name="giveUpButton" Content="Give Up" Click="giveUpButton_Click" Width="100"/>
                 <Button Grid.Row="1" Grid.Column="1" x:Name="submitButton" Content="Submit" Click="submitButton_Click" Width="100"/>
                 <Button Grid.Row="2" Grid.Column="0" x:Name="replayButton" Content="Replay" Click="replayButton_Click" Width="100"/>
@@ -86,23 +86,27 @@
 
         <VisualStateManager.VisualStateGroups>
 
-            <!-- Visual states reflect the application's view state -->
             <VisualStateGroup x:Name="ApplicationViewStates">
                 <VisualState x:Name="FullScreenLandscape">
-                    <!--
                     <Storyboard>
-                        
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="content" Storyboard.TargetProperty="Orientation">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="Horizontal"/>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="gobanCanvas" Storyboard.TargetProperty="(Grid.Column)">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="1"/>
                         </ObjectAnimationUsingKeyFrames>
-                    </Storyboard><!-->
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="actions" Storyboard.TargetProperty="(Grid.Row)">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
                 </VisualState>
-                <VisualState x:Name="Filled"><!--
+                
+                <VisualState x:Name="Filled">
                     <Storyboard>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="content" Storyboard.TargetProperty="Orientation">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="Horizontal"/>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="gobanCanvas" Storyboard.TargetProperty="(Grid.Column)">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="1"/>
                         </ObjectAnimationUsingKeyFrames>
-                    </Storyboard><!-->
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="actions" Storyboard.TargetProperty="(Grid.Row)">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
                 </VisualState>
 
                 <!-- The entire page respects the narrower 100-pixel margin convention for portrait -->
@@ -111,14 +115,15 @@
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="backButton" Storyboard.TargetProperty="Style">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource PortraitBackButtonStyle}"/>
                         </ObjectAnimationUsingKeyFrames>
-                        <!--
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="content" Storyboard.TargetProperty="Orientation">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="Horizontal"/>
-                        </ObjectAnimationUsingKeyFrames><!-->
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="gobanCanvas" Storyboard.TargetProperty="(Grid.Column)">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="1"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="actions" Storyboard.TargetProperty="(Grid.Row)">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
+                        </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>
 
-                <!-- The back button and title have different styles when snapped -->
                 <VisualState x:Name="Snapped">
                     <Storyboard>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="backButton" Storyboard.TargetProperty="Style">
@@ -127,17 +132,11 @@
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="pageTitle" Storyboard.TargetProperty="Style">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource SnappedPageHeaderTextStyle}"/>
                         </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="gobanCanvas" Storyboard.TargetProperty="(Grid.Row)">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
-                        </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="gobanCanvas" Storyboard.TargetProperty="(Grid.Column)">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="actions" Storyboard.TargetProperty="(Grid.Row)">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="1"/>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="actions" Storyboard.TargetProperty="(Grid.Column)">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
                         </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>

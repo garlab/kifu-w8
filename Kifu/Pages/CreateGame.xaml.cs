@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GoLib;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,13 +15,6 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Kifu.Pages
 {
-    struct GameInfo
-    {
-        public int size;
-        public int handicap;
-        public double komi;
-    }
-
     public sealed partial class CreateGame : Kifu.Common.LayoutAwarePage
     {
         private GameInfo _info;
@@ -28,15 +22,26 @@ namespace Kifu.Pages
         public CreateGame()
         {
             this.InitializeComponent();
+            _info = new GameInfo();
         }
 
+        /*
         protected override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
         {
+            base.LoadState(navigationParameter, pageState);
         }
 
         protected override void SaveState(Dictionary<String, Object> pageState)
         {
         }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+        }//*/
 
         #region events
 
@@ -48,15 +53,68 @@ namespace Kifu.Pages
             }
         }
 
+        private void BlackPlayerView_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            _info.Players[0].IsHuman = IsHuman(BlackPlayerView);
+        }
+
+        private void WhitePlayerView_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            _info.Players[1].IsHuman = IsHuman(WhitePlayerView);
+        }
+
         private void SizeView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var value = this.SizeView.SelectedValue as string;
-            //int index = SizeView.SelectedIndex;
-            if (value == "19x19") _info.size = 19;
-            if (value == "13x13") _info.size = 13;
-            if (value == "9x9") _info.size = 9;
+            _info.Size = Size(SizeView.SelectedValue.ToString());
+        }
+
+        private void HandicapView_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
+        {
+            _info.Handicap = (int)HandicapView.Value;
+        }
+
+        private void RuleView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            bool chinese = RuleView.SelectedValue.ToString() == "Chinese";
+            _info.Rule = chinese ? Rule.Chinese : Rule.Japanese;
         }
 
         #endregion
+
+        #region convert
+
+        static bool IsHuman(ComboBox box)
+        {
+            return box.SelectedValue.ToString() == "Human";
+        }
+
+        static int Size(String value)
+        {
+            if (value == "13x13") return 13;
+            if (value == "9x9") return 9;
+            return 19;
+        }
+
+        #endregion
+
+        private void BlackPlayerView_Loaded(object sender, RoutedEventArgs e)
+        {
+            BlackPlayerView.SelectedIndex = 1;
+        }
+
+        private void WhitePlayerView_Loaded(object sender, RoutedEventArgs e)
+        {
+            WhitePlayerView.SelectedIndex = 1;
+        }
+
+        private void SizeView_Loaded(object sender, RoutedEventArgs e)
+        {
+            SizeView.SelectedIndex = 1;
+        }
+
+        private void RuleView_Loaded(object sender, RoutedEventArgs e)
+        {
+            RuleView.SelectedIndex = 1;
+        }
     }
 }

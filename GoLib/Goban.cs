@@ -31,34 +31,86 @@ namespace GoLib
 
     public class Goban
     {
-        private int _size;
+        private GameInfo _info;
         private Colour _first;
         private Section[,] _board;
         private List<Move> _moves;
 
-        public Goban(int size, Colour first)
+        public Goban(GameInfo info)
         {
-            _size = size;
-            _first = first;
-            _board = new Section[size + 2, size + 2];
+            _info = info;
+            _first = info.Handicap == 0 ? Colour.Black : Colour.White;
+            _board = new Section[info.Size + 2, info.Size + 2];
             _moves = new List<Move>();
-            Sentinels(size);
+            Sentinels();
         }
 
-        private void Sentinels(int size)
+        private void Sentinels()
         {
-            for (int i = 1; i < size + 1; ++i)
+            int j = _info.Size + 1;
+            for (int i = 1; i < j; ++i)
             {
                 _board[0, i].stone = Stone.FAKE;
                 _board[i, 0].stone = Stone.FAKE;
-                _board[size + 1, i].stone = Stone.FAKE;
-                _board[i, size + 1].stone = Stone.FAKE;
+                _board[j, i].stone = Stone.FAKE;
+                _board[i, j].stone = Stone.FAKE;
             }
+        }
+
+        public void Clear()
+        {
+            Array.Clear(_board, 0, _board.Length);
+            _moves.Clear();
+            Sentinels();
+        }
+
+        public GameInfo Info
+        {
+            get { return _info; }
         }
 
         public int Size
         {
-            get { return _size; }
+            get { return _info.Size; }
+        }
+
+        public Rule Rule
+        {
+            get;
+            set;
+        }
+
+        public int Handicap { get; set; }
+
+        public Colour First
+        {
+            get { return _first; }
+        }
+
+        public IEnumerable<Point> Hoshis
+        {
+            get
+            {
+                if (_info.Size < 9)
+                {
+                    yield break;
+                }
+                int low = _info.Size == 9 ? 3 : 4;
+                int high = _info.Size - low + 1;
+                yield return new Point(low, low);
+                yield return new Point(low, high);
+                yield return new Point(high, low);
+                yield return new Point(high, high);
+                if (_info.Size % 2 == 1)
+                {
+                    int middle = (_info.Size / 2 + 1);
+                    yield return new Point(middle, middle);
+                    yield return new Point(low, middle);
+                    yield return new Point(middle, low);
+                    yield return new Point(high, middle);
+                    yield return new Point(middle, high);
+                }
+            }
         }
 
         public int Round
@@ -87,9 +139,30 @@ namespace GoLib
             }
         }
 
+        public IEnumerable<StoneGroup> Groups
+        {
+            get
+            {
+                var groups = new HashSet<StoneGroup>();
+                foreach (var section in _board)
+                {
+                    if (section.stoneGroup != null)
+                    {
+                        groups.Add(section.stoneGroup);
+                    }
+                }
+                return groups;
+            }
+        }
+
         public Colour CurrentColour
         {
             get { return Round % 2 == 0 ? _first : _first.OpponentColor(); }
+        }
+
+        public Player CurrentPlayer
+        {
+            get { return _info.Players[0].Color == CurrentColour ? _info.Players[0] : _info.Players[1]; }
         }
 
         public Stone GetStone(Point point)
@@ -317,9 +390,9 @@ namespace GoLib
 
         public void EraseTerritories()
         {
-            for (int i = 0; i < _size + 2; ++i)
+            for (int i = 0; i < _info.Size + 2; ++i)
             {
-                for (int j = 0; j < _size + 2; ++j)
+                for (int j = 0; j < _info.Size + 2; ++j)
                 {
                     _board[i, j].territory = null;
                 }
