@@ -129,6 +129,7 @@ namespace Kifu.Pages
         private void GobanCanvas_Loaded(object sender, RoutedEventArgs e)
         {
             FitCanvas();
+            AIMove();
         }
 
         private void Current_SizeChanged(object sender, WindowSizeChangedEventArgs e)
@@ -143,7 +144,7 @@ namespace Kifu.Pages
             {
                 case GameState.Ongoing:
                     Move(new Stone(_goban.CurrentColour, point));
-                    IAMove();
+                    AIMove();
                     break;
                 case GameState.StoneSelection:
                     MarkGroup(point);
@@ -171,7 +172,7 @@ namespace Kifu.Pages
         private void passButton_Click(object sender, RoutedEventArgs e)
         {
             Pass();
-            IAMove();
+            AIMove();
         }
 
         private void undoButton_Click(object sender, RoutedEventArgs e)
@@ -238,7 +239,7 @@ namespace Kifu.Pages
 
         #region Actions
 
-        private void IAMove()
+        private void AIMove()
         {
             if (!_goban.CurrentPlayer.IsHuman)
             {
@@ -248,7 +249,7 @@ namespace Kifu.Pages
                     Pass(); // L'IA passe toujours lorsque le joueur passe
                     return;
                 }
-                AI.WeakAI ai = new AI.WeakAI(_goban, Colour.White);
+                AI.WeakAI ai = new AI.WeakAI(_goban, _goban.CurrentColour);
                 var next = ai.NextStone();
                 if (next == null)
                     Pass();
