@@ -397,6 +397,15 @@ namespace GoLib
                     _board[i, j].territory = null;
                 }
             }
+            AllGroupsAlive();
+        }
+
+        private void AllGroupsAlive()
+        {
+            foreach (var group in Groups)
+            {
+                group.Alive = true;
+            }
         }
 
         // Must be call only once

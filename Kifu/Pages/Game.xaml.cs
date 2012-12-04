@@ -69,6 +69,8 @@ namespace Kifu.Pages
                 this.undoButton.IsEnabled = _state != GameState.Finished;
                 this.giveUpButton.IsEnabled = _state != GameState.Finished;
                 this.submitButton.IsEnabled = _state == GameState.StoneSelection;
+                Clear();
+                Draw();
             }
         }
 
@@ -80,7 +82,6 @@ namespace Kifu.Pages
             Window.Current.SizeChanged += Current_SizeChanged;
             StoneGroup.Changed += StoneGroup_Changed;
             Territory.Changed += Territory_Changed;
-            State = GameState.Ongoing;
 
             _black = new Color();
             _white = new Color();
@@ -101,6 +102,7 @@ namespace Kifu.Pages
                 _goban = new Goban(info);
                 _stones = new Image[info.Size, info.Size];
                 _territories = new Rectangle[info.Size, info.Size];
+                _state = GameState.Ongoing;
             }
         }
 
@@ -180,8 +182,8 @@ namespace Kifu.Pages
                     Undo();
                     break;
                 case GameState.StoneSelection:
+                    _goban.EraseTerritories();
                     State = GameState.Ongoing;
-                    EraseTerritories();
                     break;
             }
         }
@@ -208,11 +210,8 @@ namespace Kifu.Pages
 
         private void replayButton_Click(object sender, RoutedEventArgs e)
         {
-            State = GameState.Ongoing;
             _goban.Clear();
-            Clear();
-            DrawGrids();
-            DrawHoshis();
+            State = GameState.Ongoing;
         }
 
         private void Territory_Changed(object sender, EventArgs e)
@@ -304,22 +303,6 @@ namespace Kifu.Pages
         private void MarkGroup(GoLib.Point point)
         {
             _goban.MarkDead(point);
-        }
-
-        private void EraseTerritories()
-        {
-            _goban.EraseTerritories();
-            for (int i = 0; i < _goban.Size; ++i)
-            {
-                for (int j = 0; j < _goban.Size; ++j)
-                {
-                    if (_territories[i, j] != null)
-                    {
-                        gobanCanvas.Children.Remove(_territories[i, j]);
-                        _territories[i, j] = null;
-                    }
-                }
-            }
         }
 
         #endregion
