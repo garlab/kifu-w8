@@ -29,6 +29,7 @@ namespace GoLib
 
         private void ComputeScore()
         {
+            // TODO: use Info.Komi instead
             if (_goban.Info.Handicap == 0)
             {
                 _score[1].komi = _goban.Info.Rule == Rule.Japanese ? 6.5 : 7.5;
@@ -54,8 +55,6 @@ namespace GoLib
             {
                 _score[(int)territory.Color - 1].territories += territory.Points.Count;
             }
-            //_score[0].captured += _goban.Captured[1];
-            //_score[1].captured += _goban.Captured[0];
             _score[0].score = Total(_score[0], _goban.Info.Rule);
             _score[1].score = Total(_score[1], _goban.Info.Rule);
         }

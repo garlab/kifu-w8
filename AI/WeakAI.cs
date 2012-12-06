@@ -65,12 +65,12 @@ namespace AI
             return best;
         }
 
-        private double Value(Stone stone)
+        private double ValueOld(Stone stone)
         {
             double value = 0;
 
             int numberOfliberties = _goban.ActualLiberties(stone).Count;
-            int neighborLiberties = ActualNeigborLiberties(stone);
+            int neighborLiberties = ActualNeigborLiberties(stone).Count;
 
             if (neighborLiberties != 0)
             {
@@ -110,14 +110,64 @@ namespace AI
             return value;
         }
 
-        private int ActualNeigborLiberties(Stone stone)
+        public double Value(Stone stone)
         {
-            int actualNeigborLiberties = 0;
+            double saveValue = 0;
+            double captureValue = 0;
+            double libertyValue = 0;
+            double territoryValue = 0;
+            double libertyReduced = 0;
+
+            int actualNumberOfLiberties = _goban.ActualLiberties(stone).Count;
+            int actualNeighborLiberties = ActualNeigborLiberties(stone).Count;
+
+            libertyValue = (double)(actualNumberOfLiberties - actualNeighborLiberties) / 8;
+
+            foreach (StoneGroup groupNeighbor in _goban.GroupNeighbors(stone))
+            {
+                if (groupNeighbor.Color == stone.Color)
+                {
+                    if (groupNeighbor.Liberties.Count == 1 && actualNumberOfLiberties > 1)
+                    {
+                        saveValue += groupNeighbor.Stones.Count;
+                        territoryValue += groupNeighbor.Stones.Count;
+                    }
+                }
+                else if (groupNeighbor.Color == stone.Color.OpponentColor())
+                {
+                    if (groupNeighbor.Liberties.Count == 1)
+                    {
+                        captureValue += (double)(groupNeighbor.Stones.Count);
+                        territoryValue += groupNeighbor.Stones.Count;
+                    }
+                    else
+                    {
+                        if (actualNumberOfLiberties > 1)
+                        {
+                            libertyReduced = (double)((double)(groupNeighbor.Stones.Count * 2) / (double)(groupNeighbor.Liberties.Count - 1));
+                        }
+                    }
+                }
+            }
+
+            if (actualNumberOfLiberties == 1 && captureValue <= 0)
+            {
+                saveValue = 0;
+                territoryValue = 0;
+                libertyReduced = 0;
+            }
+
+            return saveValue + captureValue + libertyValue + territoryValue + libertyReduced;
+        }
+
+        private HashSet<Point> ActualNeigborLiberties(Stone stone)
+        {
+            var liberties = new HashSet<Point>();
             foreach (var neighbor in _goban.GroupNeighbors(stone, true))
             {
-                actualNeigborLiberties += neighbor.Liberties.Count;
+                liberties.UnionWith(neighbor.Liberties);
             }
-            return actualNeigborLiberties;
+            return liberties;
         }
 
         private Stone BestCorner()
