@@ -56,7 +56,7 @@ namespace Kifu.Pages
 
         public double SectionSize
         {
-            get { return GobanSize / _goban.Size; }
+            get { return GobanSize / _goban.Info.Size; }
         }
 
         GameState State
@@ -183,7 +183,8 @@ namespace Kifu.Pages
                     Undo();
                     break;
                 case GameState.StoneSelection:
-                    _goban.EraseTerritories();
+                    Array.Clear(_territories, 0, _territories.Length);
+                    _goban.EraseTerritories(); // perhaps useless
                     State = GameState.Ongoing;
                     break;
             }
@@ -270,8 +271,16 @@ namespace Kifu.Pages
                 {
                     UnDraw(captured);
                 }
+                UpdateCaptured(stone.Color, move.Captured.Count);
                 undoButton.IsEnabled = true;
             }
+        }
+
+        private void UpdateCaptured(Colour colour, int captured)
+        {
+            var ui = colour == Colour.Black ? blackCapturedUi : whiteCapturedUi;
+            _goban.Captured[(int)colour - 1] += captured; // TODO: move this line in Goban class
+            ui.Text = _goban.Captured[(int)colour - 1].ToString();
         }
 
         private void Pass()
@@ -297,6 +306,7 @@ namespace Kifu.Pages
                 {
                     Draw(captured);
                 }
+                UpdateCaptured(undo.Stone.Color, -undo.Captured.Count);
                 undoButton.IsEnabled = _goban.Moves.Count != 0;
             }
         }
@@ -329,13 +339,13 @@ namespace Kifu.Pages
         {
             var brush = new SolidColorBrush(_black);
 
-            for (var i = 0; i < _goban.Size; ++i)
+            for (var i = 0; i < _goban.Info.Size; ++i)
             {
                 var v = new Line();
                 var h = new Line();
                 v.X1 = h.Y1 = SectionSize / 2;
                 v.Y1 = v.Y2 = h.X1 = h.X2 = SectionSize * (i + 0.5);
-                v.X2 = h.Y2 = SectionSize * (_goban.Size - 0.5);
+                v.X2 = h.Y2 = SectionSize * (_goban.Info.Size - 0.5);
                 v.Stroke = h.Stroke = brush;
                 gobanCanvas.Children.Add(v);
                 gobanCanvas.Children.Add(h);

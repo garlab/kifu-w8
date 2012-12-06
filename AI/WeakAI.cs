@@ -21,7 +21,7 @@ namespace AI
         {
             _goban = goban;
             _color = color;
-            _strategy = goban.Size == 19 ? Strategy.Fuseki : Strategy.Normal;
+            _strategy = goban.Info.Size == 19 ? Strategy.Fuseki : Strategy.Normal;
         }
 
         public Stone NextStone()
@@ -138,10 +138,11 @@ namespace AI
 
         private IEnumerable<Point> Corner()
         {
+            int j = _goban.Info.Size - 3;
             yield return new Point(4, 4);
-            yield return new Point(4, _goban.Size - 4);
-            yield return new Point(_goban.Size - 4, 4);
-            yield return new Point(_goban.Size - 3, _goban.Size - 3);
+            yield return new Point(4, j);
+            yield return new Point(j, 4);
+            yield return new Point(j, j);
         }
     }
 }

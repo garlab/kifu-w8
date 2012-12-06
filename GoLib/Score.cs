@@ -31,7 +31,7 @@ namespace GoLib
         {
             if (_goban.Info.Handicap == 0)
             {
-                _score[0].komi = _goban.Rule == Rule.Japanese ? 6.5 : 7.5;
+                _score[1].komi = _goban.Info.Rule == Rule.Japanese ? 6.5 : 7.5;
             }
             else
             {
@@ -44,6 +44,7 @@ namespace GoLib
             foreach (var group in _goban.Groups.Where(g => !g.Alive))
             {
                 _score[(int)group.Color - 1].captured += group.Stones.Count;
+                _score[(int)group.Color.OpponentColor() - 1].territories += group.Stones.Count;
             }
             foreach (var move in _goban.Moves.Where(m => m.Captured != null))
             {
@@ -53,8 +54,10 @@ namespace GoLib
             {
                 _score[(int)territory.Color - 1].territories += territory.Points.Count;
             }
-            _score[0].score = Total(_score[0], _goban.Rule);
-            _score[1].score = Total(_score[1], _goban.Rule);
+            //_score[0].captured += _goban.Captured[1];
+            //_score[1].captured += _goban.Captured[0];
+            _score[0].score = Total(_score[0], _goban.Info.Rule);
+            _score[1].score = Total(_score[1], _goban.Info.Rule);
         }
 
         private static double Total(LocalScore ls, Rule rule)

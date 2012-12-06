@@ -35,6 +35,7 @@ namespace GoLib
         private Colour _first;
         private Section[,] _board;
         private List<Move> _moves;
+        private int[] _captured;
 
         public Goban(GameInfo info)
         {
@@ -42,11 +43,17 @@ namespace GoLib
             _first = info.Handicap == 0 ? Colour.Black : Colour.White;
             _board = new Section[info.Size + 2, info.Size + 2];
             _moves = new List<Move>();
-            Sentinels();
-            Handicap2();
+            _captured = new int[2];
+            Init();
         }
 
-        private void Handicap2()
+        private void Init()
+        {
+            Sentinels();
+            Handicap();
+        }
+
+        private void Handicap()
         {
             foreach (var h in Handicaps)
             {
@@ -69,25 +76,20 @@ namespace GoLib
 
         public void Clear()
         {
+            _captured[0] = _captured[1] = 0;
             Array.Clear(_board, 0, _board.Length);
             _moves.Clear();
-            Sentinels();
+            Init();
+        }
+
+        public int[] Captured
+        {
+            get { return _captured; }
         }
 
         public GameInfo Info
         {
             get { return _info; }
-        }
-
-        public int Size
-        {
-            get { return _info.Size; }
-        }
-
-        public Rule Rule
-        {
-            get;
-            set;
         }
 
         public Colour First
@@ -413,9 +415,9 @@ namespace GoLib
 
         public void EraseTerritories()
         {
-            for (int i = 0; i < _info.Size + 2; ++i)
+            for (int i = 1; i < _info.Size + 1; ++i)
             {
-                for (int j = 0; j < _info.Size + 2; ++j)
+                for (int j = 1; j < _info.Size + 1; ++j)
                 {
                     _board[i, j].territory = null;
                 }
@@ -428,6 +430,7 @@ namespace GoLib
             foreach (var group in Groups)
             {
                 group.Alive = true;
+                group.Territories.Clear();
             }
         }
 
@@ -508,9 +511,9 @@ namespace GoLib
 
         public IEnumerable<Point> AllLiberties()
         {
-            for (int i = 1; i <= Size; ++i)
+            for (int i = 1; i <= Info.Size; ++i)
             {
-                for (int j = 1; j <= Size; ++j)
+                for (int j = 1; j <= Info.Size; ++j)
                 {
                     if (_board[i, j].stone == null)
                     {
