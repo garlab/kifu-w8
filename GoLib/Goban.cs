@@ -445,15 +445,12 @@ namespace GoLib
                 {
                     if (_board[x, y - 1].territory == null)
                     {
-                        var territory = new Territory(liberty);
-                        _board[x, y].territory = territory;
-                        AddOwner(territory, liberty);
+                        _board[x, y].territory = new Territory(liberty);
                     }
                     else
                     {
                         _board[x, y].territory = _board[x, y - 1].territory;
                         _board[x, y].territory.Points.Add(liberty);
-                        AddOwner(_board[x, y].territory, liberty);
                     }
                 }
                 else
@@ -462,16 +459,15 @@ namespace GoLib
                     {
                         _board[x, y].territory = _board[x - 1, y].territory;
                         _board[x, y].territory.Points.Add(liberty);
-                        AddOwner(_board[x, y].territory, liberty);
                     }
                     else
                     {
                         _board[x, y].territory = _board[x, y - 1].territory;
                         _board[x, y].territory.Points.Add(liberty);
-                        AddOwner(_board[x, y].territory, liberty);
-                        Merge(_board[x, y].territory, _board[x - 1, y].territory);
+                        Merge(_board[x, y].territory, _board[x - 1, y].territory);  
                     }
                 }
+                AddOwner(_board[x, y].territory, liberty);
             }
         }
 

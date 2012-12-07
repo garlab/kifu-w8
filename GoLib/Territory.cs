@@ -47,7 +47,7 @@ namespace GoLib
             {
                 if (_marked == value) return;
                 _marked = value;
-                foreach (var group in _groups)
+                foreach (var group in _groups) // TODO: check ça
                 {
                     group.Alive = value == Colour.None || group.Color == value;
                 }
@@ -64,6 +64,11 @@ namespace GoLib
 
         public void Merge(Territory toMerge)
         {
+            foreach (var group in toMerge._groups)
+            {
+                group.Territories.Remove(toMerge);
+                group.Territories.Add(this);
+            }
             _points.UnionWith(toMerge.Points);
             _groups.UnionWith(toMerge._groups);
             Color = toMerge.Color;
