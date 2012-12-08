@@ -96,32 +96,11 @@ namespace Kifu.Pages
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            var info = e.Parameter as GameInfo;
-            if (info != null)
-            {
-                _goban = new Goban(info);
-                _stones = new Image[info.Size, info.Size];
-                _territories = new Rectangle[info.Size, info.Size];
-                _state = GameState.Ongoing;
-            }
-        }
-
-        /*
-        protected override void OnNavigatedFrom(NavigationEventArgs e)
-        {
-        }
-
-        protected override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
-        {
-            if (pageState != null && pageState.ContainsKey("goban"))
-            {
-                //_goban = (Goban)pageState["goban"];
-            }
-        }//*/
-
-        protected override void SaveState(Dictionary<String, Object> pageState)
-        {
-            //pageState["goban"] = _goban;
+            var info = GameForm.Info(e.Parameter.ToString());
+            _goban = new Goban(info);
+            _stones = new Image[info.Size, info.Size];
+            _territories = new Rectangle[info.Size, info.Size];
+            _state = GameState.Ongoing;
         }
 
         #region events

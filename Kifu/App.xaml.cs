@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Kifu.Common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -49,12 +50,17 @@ namespace Kifu
             {
                 // Créez un Frame utilisable comme contexte de navigation et naviguez jusqu'à la première page
                 rootFrame = new Frame();
-                Kifu.Common.SuspensionManager.RegisterFrame(rootFrame, "appFrame");
+                SuspensionManager.RegisterFrame(rootFrame, "appFrame");
 
                 if (args.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
-                    //TODO: chargez l'état de l'application précédemment suspendue
-                    await Kifu.Common.SuspensionManager.RestoreAsync();
+                    try
+                    {
+                        await SuspensionManager.RestoreAsync();
+                    }
+                    catch (SuspensionManagerException)
+                    {
+                    }
                 }
 
                 // Placez le frame dans la fenêtre active
@@ -82,11 +88,10 @@ namespace Kifu
         /// </summary>
         /// <param name="sender">Source de la requête de suspension.</param>
         /// <param name="e">Détails de la requête de suspension.</param>
-        private void OnSuspending(object sender, SuspendingEventArgs e)
+        private async void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
-            //TODO: enregistrez l'état de l'application et arrêtez toute activité en arrière-plan
-            //await Kifu.Common.SuspensionManager.SaveAsync();
+            await SuspensionManager.SaveAsync();
             deferral.Complete();
         }
     }

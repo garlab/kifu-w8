@@ -86,6 +86,7 @@ namespace Kifu.Common
             }
             catch (Exception e)
             {
+                // workaround : https://connect.microsoft.com/VisualStudio/feedback/details/753331/xaml-metro-app-complex-objects-as-parameter-when-navigating-between-pages-causes-crash
                 throw new SuspensionManagerException(e);
             }
         }

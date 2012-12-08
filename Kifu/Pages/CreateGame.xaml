@@ -65,16 +65,16 @@
                 <x:String>Human</x:String>
                 <x:String>CPU</x:String>
             </ComboBox>
-            <ComboBox Grid.Row="2" Grid.Column="1" Loaded="SizeView_Loaded" x:Name="SizeView" SelectionChanged="SizeView_SelectionChanged" Width="100">
+            <ComboBox Grid.Row="2" Grid.Column="1" Loaded="SizeView_Loaded" x:Name="SizeView" Width="100">
                 <x:String>19x19</x:String>
                 <x:String>13x13</x:String>
                 <x:String>9x9</x:String>
             </ComboBox>
-            <ComboBox Grid.Row="3" Grid.Column="1" Loaded="RuleView_Loaded" x:Name="RuleView" SelectionChanged="RuleView_SelectionChanged" Width="100">
+            <ComboBox Grid.Row="3" Grid.Column="1" Loaded="RuleView_Loaded" x:Name="RuleView" Width="100">
                 <x:String>Chinese</x:String>
                 <x:String>Japanese</x:String>
             </ComboBox>
-            <Slider Grid.Row="4" Grid.Column="1" x:Name="HandicapView" ValueChanged="HandicapView_ValueChanged" Minimum="0" Maximum="9" Width="100"/>
+            <Slider Grid.Row="4" Grid.Column="1" x:Name="HandicapView" Minimum="0" Maximum="9" Width="100"/>
             <Button Grid.Row="5" Grid.Column="1" x:Name="playButton" Content="Play" Click="playButton_Click"/>
         </Grid>
 

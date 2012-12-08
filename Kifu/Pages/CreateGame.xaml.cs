@@ -1,4 +1,5 @@
 ﻿using GoLib;
+using Kifu.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,87 +16,23 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Kifu.Pages
 {
-    public sealed partial class CreateGame : Kifu.Common.LayoutAwarePage
+    public static class GameForm
     {
-        private GameInfo _info;
-
-        public CreateGame()
+        public static GameInfo Info(string d)
         {
-            this.InitializeComponent();
-            _info = new GameInfo();
+            var t = d.Split(':');
+            var info = new GameInfo();
+            info.Handicap = int.Parse(t[3]);
+            info.Players[0].IsHuman = IsHuman(t[0]);
+            info.Players[1].IsHuman = IsHuman(t[1]);
+            info.Rule = Rules(t[4]);
+            info.Size = Size(t[2]);
+            return info;
         }
 
-        /*
-        protected override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
+        static bool IsHuman(String player)
         {
-            base.LoadState(navigationParameter, pageState);
-        }
-
-        protected override void SaveState(Dictionary<String, Object> pageState)
-        {
-        }
-
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-        }
-
-        protected override void OnNavigatedFrom(NavigationEventArgs e)
-        {
-        }//*/
-
-        #region events
-
-        private void playButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.Frame != null)
-            {
-                this.Frame.Navigate(typeof(Game), _info);
-            }
-        }
-
-        private void BlackPlayerView_SelectionChanged(object sender, RoutedEventArgs e)
-        {
-            _info.Players[0].IsHuman = IsHuman(BlackPlayerView);
-            if (!_info.Players[0].IsHuman)
-            {
-                _info.Players[1].IsHuman = true;
-                WhitePlayerView.SelectedIndex = 0;
-            }
-        }
-
-        private void WhitePlayerView_SelectionChanged(object sender, RoutedEventArgs e)
-        {
-            _info.Players[1].IsHuman = IsHuman(WhitePlayerView);
-            if (!_info.Players[1].IsHuman)
-            {
-                _info.Players[0].IsHuman = true;
-                BlackPlayerView.SelectedIndex = 0;
-            }
-        }
-
-        private void SizeView_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            _info.Size = Size(SizeView.SelectedValue.ToString());
-        }
-
-        private void HandicapView_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
-        {
-            _info.Handicap = (int)HandicapView.Value;
-        }
-
-        private void RuleView_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            bool chinese = RuleView.SelectedValue.ToString() == "Chinese";
-            _info.Rule = chinese ? Rule.Chinese : Rule.Japanese;
-        }
-
-        #endregion
-
-        #region convert
-
-        static bool IsHuman(ComboBox box)
-        {
-            return box.SelectedValue.ToString() == "Human";
+            return player == "Human";
         }
 
         static int Size(String value)
@@ -103,6 +40,50 @@ namespace Kifu.Pages
             if (value == "13x13") return 13;
             if (value == "9x9") return 9;
             return 19;
+        }
+
+        static Rule Rules(String rule)
+        {
+            return rule == "Chinese" ? Rule.Chinese : Rule.Japanese;
+        }
+    }
+
+    public sealed partial class CreateGame : LayoutAwarePage
+    {
+        public CreateGame()
+        {
+            this.InitializeComponent();
+        }
+
+        #region events
+
+        private void playButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.Frame != null)
+            {
+                string d = BlackPlayerView.SelectedValue.ToString() // 0 -> black
+                    + ':' + WhitePlayerView.SelectedValue.ToString() // 1 -> white
+                    + ':' + SizeView.SelectedValue.ToString() // 2 -> size
+                    + ':' + HandicapView.Value.ToString() // 3 -> handicap
+                    + ':' + RuleView.SelectedValue.ToString(); // 4 -> rules
+                this.Frame.Navigate(typeof(Game), d);
+            }
+        }
+
+        private void BlackPlayerView_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            if (BlackPlayerView.SelectedValue.ToString() != "Human")
+            {
+                WhitePlayerView.SelectedIndex = 0;
+            }
+        }
+
+        private void WhitePlayerView_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            if (WhitePlayerView.SelectedValue.ToString() != "Human")
+            {
+                BlackPlayerView.SelectedIndex = 0;
+            }
         }
 
         #endregion
