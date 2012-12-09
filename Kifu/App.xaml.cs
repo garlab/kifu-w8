@@ -54,13 +54,7 @@ namespace Kifu
 
                 if (args.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
-                    try
-                    {
-                        await SuspensionManager.RestoreAsync();
-                    }
-                    catch (SuspensionManagerException)
-                    {
-                    }
+                    await SuspensionManager.RestoreAsync();
                 }
 
                 // Placez le frame dans la fenêtre active
