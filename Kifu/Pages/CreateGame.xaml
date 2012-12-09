@@ -57,20 +57,20 @@
             <TextBlock Grid.Row="3" Text="Rules:" FontSize="14"/>
             <TextBlock Grid.Row="4" Text="Handicap:" FontSize="14"/>
 
-            <ComboBox Grid.Row="0" Grid.Column="1" Loaded="BlackPlayerView_Loaded" x:Name="BlackPlayerView" SelectionChanged="BlackPlayerView_SelectionChanged" Width="100">
+            <ComboBox Grid.Row="0" Grid.Column="1" Loaded="Box_Loaded" x:Name="BlackPlayerView" SelectionChanged="Player_Changed" Width="100">
                 <x:String>Human</x:String>
                 <x:String>CPU</x:String>
             </ComboBox>
-            <ComboBox Grid.Row="1" Grid.Column="1" Loaded="WhitePlayerView_Loaded" x:Name="WhitePlayerView" SelectionChanged="WhitePlayerView_SelectionChanged" Width="100">
+            <ComboBox Grid.Row="1" Grid.Column="1" Loaded="Box_Loaded" x:Name="WhitePlayerView" SelectionChanged="Player_Changed" Width="100">
                 <x:String>Human</x:String>
                 <x:String>CPU</x:String>
             </ComboBox>
-            <ComboBox Grid.Row="2" Grid.Column="1" Loaded="SizeView_Loaded" x:Name="SizeView" Width="100">
+            <ComboBox Grid.Row="2" Grid.Column="1" Loaded="Box_Loaded" x:Name="SizeView" Width="100">
                 <x:String>19x19</x:String>
                 <x:String>13x13</x:String>
                 <x:String>9x9</x:String>
             </ComboBox>
-            <ComboBox Grid.Row="3" Grid.Column="1" Loaded="RuleView_Loaded" x:Name="RuleView" Width="100">
+            <ComboBox Grid.Row="3" Grid.Column="1" Loaded="Box_Loaded" x:Name="RuleView" Width="100">
                 <x:String>Chinese</x:String>
                 <x:String>Japanese</x:String>
             </ComboBox>

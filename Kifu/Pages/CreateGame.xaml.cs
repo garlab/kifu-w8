@@ -30,19 +30,19 @@ namespace Kifu.Pages
             return info;
         }
 
-        static bool IsHuman(String player)
+        public static bool IsHuman(String player)
         {
             return player == "Human";
         }
 
-        static int Size(String value)
+        public static int Size(String value)
         {
             if (value == "13x13") return 13;
             if (value == "9x9") return 9;
             return 19;
         }
 
-        static Rule Rules(String rule)
+        public static Rule Rules(String rule)
         {
             return rule == "Chinese" ? Rule.Chinese : Rule.Japanese;
         }
@@ -54,8 +54,6 @@ namespace Kifu.Pages
         {
             this.InitializeComponent();
         }
-
-        #region events
 
         private void playButton_Click(object sender, RoutedEventArgs e)
         {
@@ -70,42 +68,16 @@ namespace Kifu.Pages
             }
         }
 
-        private void BlackPlayerView_SelectionChanged(object sender, RoutedEventArgs e)
+        private void Player_Changed(object sender, RoutedEventArgs e)
         {
-            if (BlackPlayerView.SelectedValue.ToString() != "Human")
-            {
-                WhitePlayerView.SelectedIndex = 0;
-            }
+            var box = sender as ComboBox;
+            if (box != null && !GameForm.IsHuman(box.SelectedValue.ToString())) Box_Loaded(box == BlackPlayerView ? WhitePlayerView : BlackPlayerView, e);
         }
 
-        private void WhitePlayerView_SelectionChanged(object sender, RoutedEventArgs e)
+        private void Box_Loaded(object sender, RoutedEventArgs e)
         {
-            if (WhitePlayerView.SelectedValue.ToString() != "Human")
-            {
-                BlackPlayerView.SelectedIndex = 0;
-            }
-        }
-
-        #endregion
-
-        private void BlackPlayerView_Loaded(object sender, RoutedEventArgs e)
-        {
-            BlackPlayerView.SelectedIndex = 0;
-        }
-
-        private void WhitePlayerView_Loaded(object sender, RoutedEventArgs e)
-        {
-            WhitePlayerView.SelectedIndex = 0;
-        }
-
-        private void SizeView_Loaded(object sender, RoutedEventArgs e)
-        {
-            SizeView.SelectedIndex = 0;
-        }
-
-        private void RuleView_Loaded(object sender, RoutedEventArgs e)
-        {
-            RuleView.SelectedIndex = 0;
+            var box = sender as ComboBox;
+            if (box != null) box.SelectedIndex = 0;
         }
     }
 }
