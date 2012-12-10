@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -59,6 +60,14 @@ namespace Kifu.Pages
         {
             if (this.Frame != null)
             {
+                var localsettings = ApplicationData.Current.LocalSettings;
+                localsettings.Values["black"] = BlackPlayerView.SelectedValue;
+                localsettings.Values["white"] = WhitePlayerView.SelectedValue;
+                localsettings.Values["size"] = SizeView.SelectedValue;
+                localsettings.Values["handicap"] = HandicapView.Value;
+                localsettings.Values["rules"] = RuleView.SelectedValue;
+
+                var color = localsettings.Values["color"];
                 string d = BlackPlayerView.SelectedValue.ToString() // 0 -> black
                     + ':' + WhitePlayerView.SelectedValue.ToString() // 1 -> white
                     + ':' + SizeView.SelectedValue.ToString() // 2 -> size

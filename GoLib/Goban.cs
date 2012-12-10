@@ -190,6 +190,11 @@ namespace GoLib
             get { return _info.Players[0].Color == CurrentColour ? _info.Players[0] : _info.Players[1]; }
         }
 
+        public Stone Top
+        {
+            get { return Moves.Count == 0 ? null : Moves[Moves.Count - 1].Stone; }
+        }
+
         public Stone GetStone(Point point)
         {
             return _board[point.X, point.Y].stone;

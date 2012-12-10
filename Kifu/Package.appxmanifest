@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
-  <Identity Name="e8012edf-7a45-4cfd-a54e-b816f05882b7" Publisher="CN=Anthony" Version="1.0.0.3" />
+  <Identity Name="11582AnthonyGarcia.Kifu" Publisher="CN=9B5BA61D-CB67-4447-B364-2D152D0E2018" Version="1.0.0.5" />
   <Properties>
     <DisplayName>Kifu</DisplayName>
-    <PublisherDisplayName>Anthony</PublisherDisplayName>
-    <Logo>Assets\StoreLogo.png</Logo>
+    <PublisherDisplayName>Anthony Garcia</PublisherDisplayName>
+    <Logo>Assets\Logos\Logox.png</Logo>
   </Properties>
   <Prerequisites>
     <OSMinVersion>6.2.1</OSMinVersion>
@@ -15,8 +15,8 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Kifu.App">
-      <VisualElements DisplayName="Kifu" Logo="Assets\Logo.png" SmallLogo="Assets\SmallLogo.png" Description="Kifu" ForegroundText="light" BackgroundColor="#464646">
-        <DefaultTile ShowName="allLogos" />
+      <VisualElements DisplayName="Go Game" Logo="Assets\Logos\Logo.png" SmallLogo="Assets\Logos\SmallLogo.png" Description="Go (圍棋 weiqi in Chinese, 囲碁 igo in Japanese, 바둑 baduk in Korean, common meaning: &quot;encircling game&quot;) is a board game for two players that originated in China more than 2,000 years ago. The game is noted for being rich in strategy despite its relatively simple rules." ForegroundText="light" BackgroundColor="#464646">
+        <DefaultTile ShowName="noLogos" ShortName="Go" />
         <SplashScreen Image="Assets\SplashScreen.png" />
         <InitialRotationPreference>
           <Rotation Preference="landscape" />
@@ -24,7 +24,4 @@
       </VisualElements>
     </Application>
   </Applications>
-  <Capabilities>
-    <Capability Name="internetClient" />
-  </Capabilities>
 </Package>

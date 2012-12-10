@@ -9,11 +9,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Kifu</RootNamespace>
     <AssemblyName>Kifu</AssemblyName>
-    <DefaultLanguage>fr-FR</DefaultLanguage>
+    <DefaultLanguage>en</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>Kifu_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>Kifu_StoreKey.pfx</PackageCertificateKeyFile>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <PackageCertificateThumbprint>C57EBE3AF65254FC18BCD8D67BF1D538A50B2893</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -133,18 +134,35 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <None Include="Kifu_StoreKey.pfx" />
     <None Include="Kifu_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\Board.png" />
     <Content Include="Assets\Logo.png" />
+    <Content Include="Assets\Logo.scale-100.png" />
+    <Content Include="Assets\Logo.scale-140.png" />
+    <Content Include="Assets\Logo.scale-180.png" />
+    <Content Include="Assets\Logo.scale-80.png" />
     <Content Include="Assets\LogoBadge.png" />
+    <Content Include="Assets\Logos\Logo.scale-100.png" />
+    <Content Include="Assets\Logos\Logo.scale-140.png" />
+    <Content Include="Assets\Logos\Logo.scale-180.png" />
+    <Content Include="Assets\Logos\Logo.scale-80.png" />
+    <Content Include="Assets\Logos\Logox.scale-100.png" />
+    <Content Include="Assets\Logos\Logox.scale-140.png" />
+    <Content Include="Assets\Logos\Logox.scale-180.png" />
+    <Content Include="Assets\Logos\SmallLogo.scale-100.png" />
+    <Content Include="Assets\Logos\SmallLogo.scale-140.png" />
+    <Content Include="Assets\Logos\SmallLogo.scale-180.png" />
+    <Content Include="Assets\Logos\SmallLogo.scale-80.png" />
     <Content Include="Assets\SmallLogo.png" />
     <Content Include="Assets\SplashScreen.png" />
     <Content Include="Assets\StoneBlack.png" />
     <Content Include="Assets\StoneWhite.png" />
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Common\ReadMe.txt" />
+    <None Include="Package.StoreAssociation.xml" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">

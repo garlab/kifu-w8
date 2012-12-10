@@ -47,7 +47,7 @@ namespace GoLib
             {
                 if (_marked == value) return;
                 _marked = value;
-                foreach (var group in _groups) // TODO: check ça
+                foreach (var group in _groups)
                 {
                     group.Alive = value == Colour.None || group.Color == value;
                 }

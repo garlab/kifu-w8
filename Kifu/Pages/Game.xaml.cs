@@ -31,9 +31,10 @@ namespace Kifu.Pages
     public sealed partial class Game : Kifu.Common.LayoutAwarePage
     {
         private Goban _goban;
+        private GameState _state;
         private Image[,] _stones;
         private Rectangle[,] _territories;
-        private GameState _state;
+        private Ellipse _marker;
         private Color _black;
         private Color _white;
         private Color _shared;
@@ -252,6 +253,7 @@ namespace Kifu.Pages
                 }
                 UpdateCaptured(stone.Color, move.Captured.Count);
                 undoButton.IsEnabled = true;
+                DrawMarker();
             }
         }
 
@@ -273,6 +275,7 @@ namespace Kifu.Pages
             }
             _goban.Pass();
             undoButton.IsEnabled = true;
+            DrawMarker();
         }
 
         private void Undo()
@@ -288,6 +291,7 @@ namespace Kifu.Pages
                 UpdateCaptured(undo.Stone.Color, -undo.Captured.Count);
                 undoButton.IsEnabled = _goban.Moves.Count != 0;
             }
+            DrawMarker();
         }
 
         private void MarkGroup(GoLib.Point point)
@@ -312,6 +316,7 @@ namespace Kifu.Pages
             DrawHoshis();
             DrawTerritories();
             DrawStones();
+            DrawMarker();
         }
 
         private void DrawGrids()
@@ -404,6 +409,27 @@ namespace Kifu.Pages
                 gobanCanvas.Children.Remove(territoryView);
                 _territories[point.X - 1, point.Y - 1] = null;
             }
+        }
+
+        public void DrawMarker()
+        {
+            gobanCanvas.Children.Remove(_marker);
+            var stone = _goban.Top;
+            if (stone != null && stone != Stone.FAKE)
+            {
+                _marker = MarkerView(stone);
+                gobanCanvas.Children.Add(_marker);
+            }
+        }
+
+        private Ellipse MarkerView(Stone stone)
+        {
+            var ellipse = new Ellipse();
+            ellipse.Width = ellipse.Height = SectionSize * 0.6;
+            ellipse.Stroke = new SolidColorBrush(Convert(stone.Color.OpponentColor()));
+            ellipse.StrokeThickness = 2;
+            Fit(ellipse, Convert(stone.Point));
+            return ellipse;
         }
 
         private Image StoneView(Stone stone, bool alive = true)
