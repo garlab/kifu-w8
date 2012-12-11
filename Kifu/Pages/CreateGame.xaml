@@ -10,12 +10,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Page.Resources>
-
-        <!-- TODO: Delete this line if the key AppName is declared in App.xaml -->
-        <x:String x:Key="AppName">Jeu de Go</x:String>
-    </Page.Resources>
-
     <!--
         This grid acts as a root panel for the page that defines two rows:
         * Row 0 contains the back button and page title
@@ -34,7 +28,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Button x:Name="backButton" Click="GoBack" IsEnabled="{Binding Frame.CanGoBack, ElementName=pageRoot}" Style="{StaticResource BackButtonStyle}"/>
-            <TextBlock x:Name="pageTitle" Grid.Column="1" Text="{StaticResource AppName}" Style="{StaticResource PageHeaderTextStyle}"/>
+            <TextBlock x:Name="pageTitle" Grid.Column="1" x:Uid="AppName" Style="{StaticResource PageHeaderTextStyle}"/>
         </Grid>
 
         <Grid Grid.Row="1" Margin="50">
@@ -51,11 +45,11 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Row="0" Text="Black Player:" FontSize="17" Margin="7"/>
-            <TextBlock Grid.Row="1" Text="White Player:" FontSize="17" Margin="7"/>
-            <TextBlock Grid.Row="2" Text="Board Size:" FontSize="17" Margin="7"/>
-            <TextBlock Grid.Row="3" Text="Rules:" FontSize="17" Margin="7"/>
-            <TextBlock Grid.Row="4" Text="Handicap:" FontSize="17" Margin="7"/>
+            <TextBlock Grid.Row="0" x:Uid="BlackPlayer" FontSize="17" Margin="7"/>
+            <TextBlock Grid.Row="1" x:Uid="WhitePlayer" FontSize="17" Margin="7"/>
+            <TextBlock Grid.Row="2" x:Uid="BoardSize" FontSize="17" Margin="7"/>
+            <TextBlock Grid.Row="3" x:Uid="Rules" FontSize="17" Margin="7"/>
+            <TextBlock Grid.Row="4" x:Uid="Handicap" FontSize="17" Margin="7"/>
 
             <ComboBox Grid.Row="0" Grid.Column="1" Loaded="Box_Loaded" Margin="7" x:Name="BlackPlayerView" SelectionChanged="Player_Changed" Width="120">
                 <x:String>Human</x:String>
@@ -75,7 +69,7 @@
                 <x:String>Japanese</x:String>
             </ComboBox>
             <Slider Grid.Row="4" Grid.Column="1" x:Name="HandicapView" Margin="7" Minimum="0" Maximum="9" Width="120"/>
-            <Button Grid.Row="5" Grid.Column="1" x:Name="playButton" Content="Play" Click="playButton_Click"/>
+            <Button Grid.Row="5" Grid.Column="1" x:Name="playButton" x:Uid="PlayButton" Click="playButton_Click"/>
         </Grid>
 
         <VisualStateManager.VisualStateGroups>
