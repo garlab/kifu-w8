@@ -19,15 +19,15 @@ namespace Kifu.Pages
 {
     public static class GameForm
     {
-        public static GameInfo Info(string d)
+        public static GameInfo Info()
         {
-            var t = d.Split(':');
+            var localsettings = ApplicationData.Current.LocalSettings;
             var info = new GameInfo();
-            info.Handicap = int.Parse(t[3]);
-            info.Players[0].IsHuman = IsHuman(t[0]);
-            info.Players[1].IsHuman = IsHuman(t[1]);
-            info.Rule = Rules(t[4]);
-            info.Size = Size(t[2]);
+            info.Handicap = int.Parse(localsettings.Values["handicap"].ToString());
+            info.Players[0].IsHuman = IsHuman(localsettings.Values["black"].ToString());
+            info.Players[1].IsHuman = IsHuman(localsettings.Values["white"].ToString());
+            info.Rule = Rules(localsettings.Values["rules"].ToString());
+            info.Size = Size(localsettings.Values["size"].ToString());
             return info;
         }
 
@@ -51,6 +51,8 @@ namespace Kifu.Pages
 
     public sealed partial class CreateGame : LayoutAwarePage
     {
+        private ApplicationDataContainer _settings = ApplicationData.Current.LocalSettings;
+
         public CreateGame()
         {
             this.InitializeComponent();
@@ -66,27 +68,47 @@ namespace Kifu.Pages
                 localsettings.Values["size"] = SizeView.SelectedValue;
                 localsettings.Values["handicap"] = HandicapView.Value;
                 localsettings.Values["rules"] = RuleView.SelectedValue;
-
-                var color = localsettings.Values["color"];
-                string d = BlackPlayerView.SelectedValue.ToString() // 0 -> black
-                    + ':' + WhitePlayerView.SelectedValue.ToString() // 1 -> white
-                    + ':' + SizeView.SelectedValue.ToString() // 2 -> size
-                    + ':' + HandicapView.Value.ToString() // 3 -> handicap
-                    + ':' + RuleView.SelectedValue.ToString(); // 4 -> rules
-                this.Frame.Navigate(typeof(Game), d);
+                this.Frame.Navigate(typeof(Game));
             }
         }
 
         private void Player_Changed(object sender, RoutedEventArgs e)
         {
             var box = sender as ComboBox;
-            if (box != null && !GameForm.IsHuman(box.SelectedValue.ToString())) Box_Loaded(box == BlackPlayerView ? WhitePlayerView : BlackPlayerView, e);
+            if (box != null && !GameForm.IsHuman(box.SelectedValue.ToString()))
+            {
+                Init(box == BlackPlayerView ? WhitePlayerView : BlackPlayerView);
+            }
         }
 
-        private void Box_Loaded(object sender, RoutedEventArgs e)
+        private void Black_Loaded(object sender, RoutedEventArgs e)
         {
-            var box = sender as ComboBox;
-            if (box != null) box.SelectedIndex = 0;
+            BlackPlayerView.SelectedValue = _settings.Values["black"];
+        }
+
+        private void White_Loaded(object sender, RoutedEventArgs e)
+        {
+            WhitePlayerView.SelectedValue = _settings.Values["white"];
+        }
+
+        private void Size_Loaded(object sender, RoutedEventArgs e)
+        {
+            SizeView.SelectedValue = _settings.Values["size"];
+        }
+
+        private void Handicap_Loaded(object sender, RoutedEventArgs e)
+        {
+            HandicapView.Value = int.Parse(_settings.Values["handicap"].ToString());
+        }
+
+        private void Rules_Loaded(object sender, RoutedEventArgs e)
+        {
+            RuleView.SelectedValue = _settings.Values["rules"];
+        }
+
+        private void Init(ComboBox box)
+        {
+            box.SelectedIndex = 0;
         }
     }
 }

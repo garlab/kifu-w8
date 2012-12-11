@@ -51,24 +51,24 @@
             <TextBlock Grid.Row="3" x:Uid="Rules" FontSize="17" Margin="7"/>
             <TextBlock Grid.Row="4" x:Uid="Handicap" FontSize="17" Margin="7"/>
 
-            <ComboBox Grid.Row="0" Grid.Column="1" Loaded="Box_Loaded" Margin="7" x:Name="BlackPlayerView" SelectionChanged="Player_Changed" Width="120">
+            <ComboBox Grid.Row="0" Grid.Column="1" Loaded="Black_Loaded" Margin="7" x:Name="BlackPlayerView" SelectionChanged="Player_Changed" Width="120">
                 <x:String>Human</x:String>
                 <x:String>CPU</x:String>
             </ComboBox>
-            <ComboBox Grid.Row="1" Grid.Column="1" Loaded="Box_Loaded" Margin="7" x:Name="WhitePlayerView" SelectionChanged="Player_Changed" Width="120">
+            <ComboBox Grid.Row="1" Grid.Column="1" Loaded="White_Loaded" Margin="7" x:Name="WhitePlayerView" SelectionChanged="Player_Changed" Width="120">
                 <x:String>Human</x:String>
                 <x:String>CPU</x:String>
             </ComboBox>
-            <ComboBox Grid.Row="2" Grid.Column="1" Loaded="Box_Loaded" Margin="7" x:Name="SizeView" Width="120">
+            <ComboBox Grid.Row="2" Grid.Column="1" Loaded="Size_Loaded" Margin="7" x:Name="SizeView" Width="120">
                 <x:String>19x19</x:String>
                 <x:String>13x13</x:String>
                 <x:String>9x9</x:String>
             </ComboBox>
-            <ComboBox Grid.Row="3" Grid.Column="1" Loaded="Box_Loaded" Margin="7" x:Name="RuleView" Width="120">
+            <ComboBox Grid.Row="3" Grid.Column="1" Loaded="Rules_Loaded" Margin="7" x:Name="RuleView" Width="120">
                 <x:String>Chinese</x:String>
                 <x:String>Japanese</x:String>
             </ComboBox>
-            <Slider Grid.Row="4" Grid.Column="1" x:Name="HandicapView" Margin="7" Minimum="0" Maximum="9" Width="120"/>
+            <Slider Grid.Row="4" Grid.Column="1" x:Name="HandicapView" Loaded="Handicap_Loaded" Margin="7" Minimum="0" Maximum="9" Width="120"/>
             <Button Grid.Row="5" Grid.Column="1" x:Name="playButton" x:Uid="PlayButton" Click="playButton_Click"/>
         </Grid>
 

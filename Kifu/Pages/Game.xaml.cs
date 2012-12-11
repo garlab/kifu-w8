@@ -97,7 +97,7 @@ namespace Kifu.Pages
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            var info = GameForm.Info(e.Parameter.ToString());
+            var info = GameForm.Info();
             _goban = new Goban(info);
             _stones = new Image[info.Size, info.Size];
             _territories = new Rectangle[info.Size, info.Size];
