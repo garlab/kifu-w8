@@ -66,10 +66,7 @@ namespace Kifu.Pages
             set
             {
                 _state = value;
-                this.passButton.IsEnabled = _state == GameState.Ongoing;
-                this.undoButton.IsEnabled = _state != GameState.Finished;
-                this.giveUpButton.IsEnabled = _state != GameState.Finished;
-                this.submitButton.IsEnabled = _state == GameState.StoneSelection;
+                UpdateButtons();
                 Clear();
                 Draw();
             }
@@ -89,7 +86,7 @@ namespace Kifu.Pages
             _black.A = _white.A = 255;
             _white.R = _white.G = _white.B = 255;
             _shared = new Color();
-            _shared.A = 255;
+            _shared.A = 0;
             _shared.R = 255;
             _shared.G = _shared.B = 120;
         }
@@ -257,6 +254,14 @@ namespace Kifu.Pages
             }
         }
 
+        public void UpdateButtons()
+        {
+            this.passButton.IsEnabled = _state == GameState.Ongoing;
+            this.undoButton.IsEnabled = _state != GameState.Finished && _goban.Moves.Count != 0;
+            this.giveUpButton.IsEnabled = _state != GameState.Finished;
+            this.submitButton.IsEnabled = _state == GameState.StoneSelection;
+        }
+
         private void UpdateCaptured(Colour colour, int captured)
         {
             var ui = colour == Colour.Black ? blackCapturedUi : whiteCapturedUi;
@@ -289,8 +294,8 @@ namespace Kifu.Pages
                     Draw(captured);
                 }
                 UpdateCaptured(undo.Stone.Color, -undo.Captured.Count);
-                undoButton.IsEnabled = _goban.Moves.Count != 0;
             }
+            UpdateButtons();
             DrawMarker();
         }
 

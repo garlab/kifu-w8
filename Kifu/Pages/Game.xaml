@@ -45,42 +45,49 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Grid x:Name="actions" Margin="20,20,20,20">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Button Grid.Row="0" Grid.Column="0" x:Name="passButton" x:Uid="Pass" Click="passButton_Click" Width="120"/>
-                <Button Grid.Row="0" Grid.Column="1" x:Name="undoButton" x:Uid="Undo" Click="undoButton_Click" Width="120" IsEnabled="False"/>
-                <Button Grid.Row="1" Grid.Column="0" x:Name="giveUpButton" x:Uid="GiveUp" Click="giveUpButton_Click" Width="120"/>
-                <Button Grid.Row="1" Grid.Column="1" x:Name="submitButton" x:Uid="Submit" Click="submitButton_Click" Width="120"/>
-                <Button Grid.Row="2" Grid.Column="0" x:Name="replayButton" x:Uid="Replay" Click="replayButton_Click" Width="120"/>
-                <TextBlock Grid.Row="3" Grid.Column="0" x:Uid="BlackScore" FontSize="14" Margin="5"/>
-                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="blackScoreUi" FontSize="14" Margin="5"/>
-                <TextBlock Grid.Row="4" Grid.Column="0" x:Uid="WhiteScore" FontSize="14" Margin="5"/>
-                <TextBlock Grid.Row="4" Grid.Column="1" x:Name="whiteScoreUi" FontSize="14" Margin="5"/>
-                <TextBlock Grid.Row="5" Grid.Column="0" x:Uid="BlackCaptured" FontSize="14" Margin="5"/>
-                <TextBlock Grid.Row="5" Grid.Column="1" x:Name="blackCapturedUi" FontSize="14" Margin="5"/>
-                <TextBlock Grid.Row="6" Grid.Column="0" x:Uid="WhiteCaptured" FontSize="14" Margin="5"/>
-                <TextBlock Grid.Row="6" Grid.Column="1" x:Name="whiteCapturedUi" FontSize="14" Margin="5"/>
-                <TextBlock Grid.Row="7" Grid.Column="0" x:Uid="Winner" FontSize="14" Margin="5"/>
-                <TextBlock Grid.Row="7" Grid.Column="1" x:Name="winnerUi" FontSize="14" Margin="5"/>
-                <TextBlock Grid.Row="8" Grid.Column="0" x:Uid="Result" FontSize="14" Margin="5"/>
-                <TextBlock Grid.Row="8" Grid.Column="1" x:Name="resultUi" FontSize="14" Margin="5"/>
-            </Grid>
+            <StackPanel x:Name="actions" Orientation="Vertical">
+                <GridView Width="280" SelectionMode="None" IsItemClickEnabled="False">
+                    <GridView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapGrid Orientation="Horizontal" MaximumRowsOrColumns="2"/>
+                        </ItemsPanelTemplate>
+                    </GridView.ItemsPanel>
+                    <Button x:Name="passButton" x:Uid="Pass" Click="passButton_Click" Width="115"/>
+                    <Button x:Name="undoButton" x:Uid="Undo" Click="undoButton_Click" Width="115" IsEnabled="False"/>
+                    <Button x:Name="giveUpButton" x:Uid="GiveUp" Click="giveUpButton_Click" Width="115"/>
+                    <Button x:Name="submitButton" x:Uid="Submit" Click="submitButton_Click" Width="115" IsEnabled="False"/>
+                    <Button x:Name="replayButton" x:Uid="Replay" Click="replayButton_Click" Width="115"/>
+                </GridView>
 
-            <Canvas x:Name="gobanCanvas" Grid.Row="0" Grid.Column="1" Loaded="GobanCanvas_Loaded" PointerReleased="Canvas_PointerReleased">
+                <Grid Margin="20,20,20,20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" x:Uid="BlackScore" FontSize="14" Margin="5"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="blackScoreUi" FontSize="14" Margin="5"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" x:Uid="WhiteScore" FontSize="14" Margin="5"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" x:Name="whiteScoreUi" FontSize="14" Margin="5"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" x:Uid="BlackCaptured" FontSize="14" Margin="5"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" x:Name="blackCapturedUi" FontSize="14" Margin="5"/>
+                    <TextBlock Grid.Row="3" Grid.Column="0" x:Uid="WhiteCaptured" FontSize="14" Margin="5"/>
+                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="whiteCapturedUi" FontSize="14" Margin="5"/>
+                    <TextBlock Grid.Row="4" Grid.Column="0" x:Uid="Winner" FontSize="14" Margin="5"/>
+                    <TextBlock Grid.Row="4" Grid.Column="1" x:Name="winnerUi" FontSize="14" Margin="5"/>
+                    <TextBlock Grid.Row="5" Grid.Column="0" x:Uid="Result" FontSize="14" Margin="5"/>
+                    <TextBlock Grid.Row="5" Grid.Column="1" x:Name="resultUi" FontSize="14" Margin="5"/>
+                </Grid>
+            </StackPanel>
+
+            <Canvas x:Name="gobanCanvas" Loaded="GobanCanvas_Loaded" PointerReleased="Canvas_PointerReleased">
                 <Canvas.Background>
                     <ImageBrush ImageSource="ms-appx:///Assets/Board.png"/>
                 </Canvas.Background>

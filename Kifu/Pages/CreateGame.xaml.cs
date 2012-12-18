@@ -83,27 +83,39 @@ namespace Kifu.Pages
 
         private void Black_Loaded(object sender, RoutedEventArgs e)
         {
-            BlackPlayerView.SelectedValue = _settings.Values["black"];
+            if (_settings.Values["black"] == null)
+                Init(BlackPlayerView);
+            else
+                BlackPlayerView.SelectedValue = _settings.Values["black"];
         }
 
         private void White_Loaded(object sender, RoutedEventArgs e)
         {
-            WhitePlayerView.SelectedValue = _settings.Values["white"];
+            if (_settings.Values["white"] == null)
+                Init(WhitePlayerView);
+            else
+                WhitePlayerView.SelectedValue = _settings.Values["white"];
         }
 
         private void Size_Loaded(object sender, RoutedEventArgs e)
         {
-            SizeView.SelectedValue = _settings.Values["size"];
+            if (_settings.Values["size"] == null)
+                Init(SizeView);
+            else
+                SizeView.SelectedValue = _settings.Values["size"];
         }
 
         private void Handicap_Loaded(object sender, RoutedEventArgs e)
         {
-            HandicapView.Value = int.Parse(_settings.Values["handicap"].ToString());
+            HandicapView.Value = _settings.Values["handicap"] == null ? 0 : int.Parse(_settings.Values["handicap"].ToString());
         }
 
         private void Rules_Loaded(object sender, RoutedEventArgs e)
         {
-            RuleView.SelectedValue = _settings.Values["rules"];
+            if (_settings.Values["rules"] == null)
+                Init(RuleView);
+            else
+                RuleView.SelectedValue = _settings.Values["rules"];
         }
 
         private void Init(ComboBox box)
