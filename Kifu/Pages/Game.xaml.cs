@@ -18,6 +18,11 @@ using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.ViewManagement;
 using Windows.UI.Core;
 using GoLib;
+using Windows.UI.Popups;
+using Windows.Storage.Pickers;
+using Windows.Storage;
+using Windows.Storage.Streams;
+using GoLib.SGF;
 
 // Pour en savoir plus sur le modèle d'élément Page de base, consultez la page http://go.microsoft.com/fwlink/?LinkId=234237
 
@@ -185,6 +190,27 @@ namespace Kifu.Pages
             whiteScoreUi.Text = whiteScore.ToString();
             winnerUi.Text = blackScore > whiteScore ? "Black" : "White";
             resultUi.Text = winnerUi.Text[0] + "+" + Math.Abs(blackScore - whiteScore);
+        }
+
+        private async void saveButton_Click(object sender, RoutedEventArgs e)
+        {
+            var savePicker = new FileSavePicker();
+            savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            savePicker.FileTypeChoices.Add("Smart Game Format", new List<string>() { ".sgf" });
+            savePicker.DefaultFileExtension = ".sgf";
+            savePicker.SuggestedFileName = "Game " + new DateTime().ToString("u");
+            var savedItem = await savePicker.PickSaveFileAsync();
+
+            if (null != savedItem)
+            {
+                var writeStream = await savedItem.OpenAsync(FileAccessMode.ReadWrite);
+                var oStream = writeStream.GetOutputStreamAt(0);
+                var dWriter = new DataWriter(oStream);
+                dWriter.WriteString(SgfHelper.ToString(_goban));
+
+                await dWriter.StoreAsync();
+                await oStream.FlushAsync();
+            }
         }
 
         private void replayButton_Click(object sender, RoutedEventArgs e)

@@ -44,6 +44,9 @@
     <Compile Include="Point.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Score.cs" />
+    <Compile Include="SGF\SgfHelper.cs" />
+    <Compile Include="SGF\SgfReader.cs" />
+    <Compile Include="SGF\SgfWriter.cs" />
     <Compile Include="Stone.cs" />
     <Compile Include="StoneGroup.cs" />
     <Compile Include="Territory.cs" />

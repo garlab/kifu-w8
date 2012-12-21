@@ -183,4 +183,7 @@
   <data name="Winner.Text" xml:space="preserve">
     <value>الفائز.</value>
   </data>
+  <data name="Save.Content" xml:space="preserve">
+    <value>Save</value>
+  </data>
 </root>
