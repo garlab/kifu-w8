@@ -78,5 +78,15 @@ namespace GoLib
             _stones.UnionWith(toMerge._stones);
             _liberties.UnionWith(toMerge._liberties);
         }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder((_stones.Count + 1) * 4);
+            foreach (var stone in _stones)
+            {
+                sb.Append(stone.Point);
+            }
+            return sb.ToString();
+        }
     }
 }

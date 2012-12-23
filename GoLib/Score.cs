@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -14,12 +15,30 @@ namespace GoLib
     {
         private Goban _goban;
         private LocalScore[] _score;
+        private Colour _winner;
+        private string _result;
 
         public Score(Goban goban)
         {
             _goban = goban;
             _score = new LocalScore[2];
-            ComputeScore();
+        }
+
+        public void Clear()
+        {
+            _score = new LocalScore[2];
+            _winner = Colour.None;
+            _result = null;
+        }
+
+        public Colour Winner
+        {
+            get { return _winner; }
+        }
+
+        public string Result
+        {
+            get { return _result; }
         }
 
         public double Get(Colour color)
@@ -27,17 +46,9 @@ namespace GoLib
             return _score[(int)color - 1].score;
         }
 
-        private void ComputeScore()
+        public void ComputeScore()
         {
-            // TODO: use Info.Komi instead
-            if (_goban.Info.Handicap == 0)
-            {
-                _score[1].komi = _goban.Info.Rule == Rule.Japanese ? 6.5 : 7.5;
-            }
-            else
-            {
-                _score[1].komi = 0.5;
-            }
+            _score[1].komi = _goban.Info.Komi;
             foreach (var group in _goban.Groups.Where(g => g.Alive))
             {
                 _score[(int)group.Color - 1].stones += group.Stones.Count;
@@ -57,6 +68,19 @@ namespace GoLib
             }
             _score[0].score = Total(_score[0], _goban.Info.Rule);
             _score[1].score = Total(_score[1], _goban.Info.Rule);
+            _winner = Get(Colour.Black) > Get(Colour.White) ? Colour.Black : Colour.White;
+            _result = _winner.ToString()[0] + "+" + Math.Abs(_score[0].score - _score[1].score).ToString(new CultureInfo("en-US"));
+        }
+
+        public void GiveUp(Colour winner)
+        {
+            _winner = winner;
+            _result = _winner.ToString()[0] + "+R";
+        }
+
+        public override string ToString()
+        {
+            return _result == null ? "" : "RE[" + _result + "]";
         }
 
         private static double Total(LocalScore ls, Rule rule)

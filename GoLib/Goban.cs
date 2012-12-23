@@ -32,6 +32,7 @@ namespace GoLib
     public class Goban
     {
         private GameInfo _info;
+        private Score _score;
         private Colour _first;
         private Section[,] _board;
         private List<Move> _moves;
@@ -40,6 +41,7 @@ namespace GoLib
         public Goban(GameInfo info)
         {
             _info = info;
+            _score = new Score(this);
             _first = info.Handicap == 0 ? Colour.Black : Colour.White;
             _board = new Section[info.Size + 2, info.Size + 2];
             _moves = new List<Move>();
@@ -67,10 +69,10 @@ namespace GoLib
             int j = _info.Size + 1;
             for (int i = 1; i < j; ++i)
             {
-                _board[0, i].stone = Stone.FAKE;
-                _board[i, 0].stone = Stone.FAKE;
-                _board[j, i].stone = Stone.FAKE;
-                _board[i, j].stone = Stone.FAKE;
+                _board[0, i].stone = 
+                    _board[i, 0].stone = 
+                    _board[j, i].stone = 
+                    _board[i, j].stone = Stone.FAKE;
             }
         }
 
@@ -79,6 +81,7 @@ namespace GoLib
             _captured[0] = _captured[1] = 0;
             Array.Clear(_board, 0, _board.Length);
             _moves.Clear();
+            _score.Clear();
             Init();
         }
 
@@ -90,6 +93,11 @@ namespace GoLib
         public GameInfo Info
         {
             get { return _info; }
+        }
+
+        public Score Score
+        {
+            get { return _score; }
         }
 
         public Colour First
@@ -123,7 +131,7 @@ namespace GoLib
             }
         }
 
-        private IEnumerable<Point> Handicaps
+        public IEnumerable<Point> Handicaps
         {
             get
             {
@@ -543,7 +551,7 @@ namespace GoLib
             var move = _moves.Last();
             _moves.Remove(move);
 
-            if (move.Stone == Stone.FAKE)
+            if (move.Stone.IsPass)
             {
                 return null;
             }
@@ -558,7 +566,7 @@ namespace GoLib
 
         public void Pass()
         {
-            _moves.Add(new Move(Stone.FAKE, null));
+            _moves.Add(new Move(new Stone(CurrentColour, Point.Empty), null));
         }
     }
 }

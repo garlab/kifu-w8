@@ -1,4 +1,5 @@
 ﻿
+using System.Globalization;
 namespace GoLib
 {
     public class GameInfo
@@ -47,6 +48,14 @@ namespace GoLib
         {
             double v = _rule == Rule.Japanese ? 6.5 : 7.5;
             Komi = _handicap == 0 ? v : 0.5;
+        }
+
+        public override string ToString()
+        {
+            return "SZ[" + Size.ToString() + "]"
+                + "HA[" + Handicap.ToString() + "]"
+                + "KM[" + Komi.ToString("F", new CultureInfo("en-US")) + "]"
+                + "RU[" + Rule.ToString() + "]";
         }
     }
 }

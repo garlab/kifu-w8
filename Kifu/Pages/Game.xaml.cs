@@ -175,21 +175,21 @@ namespace Kifu.Pages
         private void giveUpButton_Click(object sender, RoutedEventArgs e)
         {
             State = GameState.Finished;
-            Colour winner = _goban.CurrentColour.OpponentColor();
-            winnerUi.Text = winner.ToString();
-            resultUi.Text = winner.ToString()[0] + "+R";
+            Score score = _goban.Score;
+            score.GiveUp(_goban.CurrentColour.OpponentColor());
+            winnerUi.Text = score.Winner.ToString();
+            resultUi.Text = score.Result;
         }
 
         private void submitButton_Click(object sender, RoutedEventArgs e)
         {
             State = GameState.Finished;
-            Score score = new Score(_goban);
-            var blackScore = score.Get(Colour.Black);
-            var whiteScore = score.Get(Colour.White);
-            blackScoreUi.Text = blackScore.ToString();
-            whiteScoreUi.Text = whiteScore.ToString();
-            winnerUi.Text = blackScore > whiteScore ? "Black" : "White";
-            resultUi.Text = winnerUi.Text[0] + "+" + Math.Abs(blackScore - whiteScore);
+            Score score = _goban.Score;
+            score.ComputeScore(); // TODO: calculer le score au fur et à mesure
+            blackScoreUi.Text = score.Get(Colour.Black).ToString();
+            whiteScoreUi.Text = score.Get(Colour.White).ToString();
+            winnerUi.Text = score.Winner.ToString();
+            resultUi.Text = score.Result;
         }
 
         private async void saveButton_Click(object sender, RoutedEventArgs e)
@@ -203,14 +203,19 @@ namespace Kifu.Pages
 
             if (null != savedItem)
             {
+                var content = SgfHelper.ToString(_goban);
                 var writeStream = await savedItem.OpenAsync(FileAccessMode.ReadWrite);
+                writeStream.Size = 0;
                 var oStream = writeStream.GetOutputStreamAt(0);
                 var dWriter = new DataWriter(oStream);
-                dWriter.WriteString(SgfHelper.ToString(_goban));
+                dWriter.WriteString(content);
 
                 await dWriter.StoreAsync();
                 await oStream.FlushAsync();
+                
             }
+            //this.DataContext = savedItem;
+            //var mruToken = StorageApplicationPermissions.MostRecentlyUsedList.Add(savedItem);
         }
 
         private void replayButton_Click(object sender, RoutedEventArgs e)
@@ -248,7 +253,7 @@ namespace Kifu.Pages
             if (!_goban.CurrentPlayer.IsHuman)
             {
                 var lastMove = _goban.Moves.Count == 0 ? null : _goban.Moves.Last();
-                if (lastMove != null && lastMove.Stone == Stone.FAKE)
+                if (lastMove != null && lastMove.Stone.IsPass)
                 {
                     Pass(); // L'IA passe toujours lorsque le joueur passe
                     return;
@@ -274,7 +279,7 @@ namespace Kifu.Pages
                 {
                     UnDraw(captured);
                 }
-                UpdateCaptured(stone.Color, move.Captured.Count);
+                UpdateCaptured(stone.Color, move.Captured.Count); // TODO: Move into goban.move
                 undoButton.IsEnabled = true;
                 DrawMarker();
             }
@@ -298,7 +303,7 @@ namespace Kifu.Pages
         private void Pass()
         {
             var lastMove = _goban.Moves.Count == 0 ? null : _goban.Moves.Last();
-            if (lastMove != null && lastMove.Stone == Stone.FAKE)
+            if (lastMove != null && lastMove.Stone.IsPass)
             {
                 State = GameState.StoneSelection;
                 _goban.ComputeTerritories();
@@ -319,7 +324,7 @@ namespace Kifu.Pages
                 {
                     Draw(captured);
                 }
-                UpdateCaptured(undo.Stone.Color, -undo.Captured.Count);
+                UpdateCaptured(undo.Stone.Color, -undo.Captured.Count); // TODO: Move into goban.undo
             }
             UpdateButtons();
             DrawMarker();
@@ -446,7 +451,7 @@ namespace Kifu.Pages
         {
             gobanCanvas.Children.Remove(_marker);
             var stone = _goban.Top;
-            if (stone != null && stone != Stone.FAKE)
+            if (stone != null && !stone.IsPass)
             {
                 _marker = MarkerView(stone);
                 gobanCanvas.Children.Add(_marker);

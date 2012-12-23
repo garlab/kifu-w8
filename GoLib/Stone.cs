@@ -10,8 +10,6 @@ namespace GoLib
         private readonly Colour _color;
         private readonly Point _point;
 
-        public static Stone FAKE = new Stone(Colour.None, new Point(-1, -1));
-
         public Stone(Colour color, Point point)
         {
             _color = color;
@@ -20,6 +18,7 @@ namespace GoLib
 
         public Point Point { get { return _point; } }
         public Colour Color { get { return _color; } }
+        public bool IsPass { get { return _point == Point.Empty; } }
 
         public override bool Equals(object obj)
         {
@@ -30,6 +29,11 @@ namespace GoLib
         public override int GetHashCode()
         {
             return _point.GetHashCode() + (int)_color;
+        }
+
+        public override string ToString()
+        {
+            return _color.ToString()[0] + _point.ToString();
         }
 
         public static bool operator ==(Stone a, Stone b)
@@ -51,5 +55,7 @@ namespace GoLib
         {
             return !(a == b);
         }
+
+        public static readonly Stone FAKE = new Stone(Colour.None, Point.Empty);
     }
 }

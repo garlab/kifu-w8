@@ -73,5 +73,15 @@ namespace GoLib
             _groups.UnionWith(toMerge._groups);
             Color = toMerge.Color;
         }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder((_points.Count + 1) * 4);
+            foreach (var point in _points)
+            {
+                sb.Append(point);
+            }
+            return sb.ToString();
+        }
     }
 }

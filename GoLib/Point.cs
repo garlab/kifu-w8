@@ -30,24 +30,40 @@ namespace GoLib
             return _x * 67 + _y;
         }
 
+        public override string ToString()
+        {
+            if (this == Empty)
+            {
+                return "[]";
+            }
+            char x = (char)((int)'a' + _x - 1);
+            char y = (char)((int)'a' + _y - 1);
+            return "[" + x.ToString() + y.ToString() + "]";
+        }
+
         public static bool operator ==(Point a, Point b)
         {
-            if (Object.ReferenceEquals(a,b))
+            if (Object.ReferenceEquals(a, b))
             {
                 return true;
             }
-            
+
             if ((object)a == null || (object)b == null)
             {
                 return false;
             }
-            
-            return a._x == b._x && a._y == b._y;    
+
+            return a._x == b._x && a._y == b._y;
         }
 
         public static bool operator !=(Point a, Point b)
         {
             return !(a == b);
+        }
+
+        public static Point Empty
+        {
+            get { return new Point(-1, -1); }
         }
     }
 }
