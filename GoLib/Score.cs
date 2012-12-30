@@ -6,7 +6,7 @@ using System.Text;
 
 namespace GoLib
 {
-    public enum Rule
+    public enum Rules
     {
         Chinese, Japanese
     }
@@ -83,12 +83,12 @@ namespace GoLib
             return _result == null ? "" : "RE[" + _result + "]";
         }
 
-        private static double Total(LocalScore ls, Rule rule)
+        private static double Total(LocalScore ls, Rules rule)
         {
             switch (rule)
             {
-                case Rule.Chinese: return ls.territories + ls.stones + ls.komi;
-                case Rule.Japanese: return ls.territories - ls.captured + ls.komi;
+                case Rules.Chinese: return ls.territories + ls.stones + ls.komi;
+                case Rules.Japanese: return ls.territories - ls.captured + ls.komi;
                 default: return 0;
             }
         }

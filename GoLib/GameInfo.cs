@@ -5,7 +5,7 @@ namespace GoLib
     public class GameInfo
     {
         private int _handicap;
-        private Rule _rule;
+        private Rules _rule;
         private Player[] _players;
 
         public GameInfo()
@@ -34,7 +34,7 @@ namespace GoLib
             }
         }
 
-        public Rule Rule
+        public Rules Rule
         {
             get { return _rule; }
             set
@@ -46,7 +46,7 @@ namespace GoLib
 
         private void UpdateKomi()
         {
-            double v = _rule == Rule.Japanese ? 6.5 : 7.5;
+            double v = _rule == Rules.Japanese ? 6.5 : 7.5;
             Komi = _handicap == 0 ? v : 0.5;
         }
 

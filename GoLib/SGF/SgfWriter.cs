@@ -9,7 +9,7 @@ namespace GoLib
     public static class SgfWriter
     {
         private const int max = 5000;
-        private const string header = "(;GM[1]FF[4]CA[UTF-8]AP[Kifu-Windows8]ST[2]\n";
+        private const string header = "(;GM[1]FF[4]CA[UTF-8]AP[Kifu-Windows8:1]ST[2]\n";
 
         public static String ToSGF(Goban goban)
         {

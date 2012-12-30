@@ -31,7 +31,7 @@ namespace Kifu.Pages
             info.Handicap = int.Parse(localsettings.Values["handicap"].ToString());
             info.Players[0].IsHuman = IsHuman(localsettings.Values["black"].ToString());
             info.Players[1].IsHuman = IsHuman(localsettings.Values["white"].ToString());
-            info.Rule = Rules(localsettings.Values["rules"].ToString());
+            info.Rule = Rule(localsettings.Values["rules"].ToString());
             info.Size = Size(localsettings.Values["size"].ToString());
             return info;
         }
@@ -48,9 +48,10 @@ namespace Kifu.Pages
             return 19;
         }
 
-        public static Rule Rules(String rule)
+        public static Rules Rule(String rules)
         {
-            return rule == "Chinese" ? Rule.Chinese : Rule.Japanese;
+            // TODO: faire une methode de parsing générique avec le parser sgf
+            return rules == "Chinese" ? Rules.Chinese : Rules.Japanese;
         }
     }
 
@@ -130,22 +131,15 @@ namespace Kifu.Pages
 
         private async void pickSgfButton_Click(object sender, RoutedEventArgs e)
         {
-            // File picker APIs don't work if the app is in a snapped state.
-            // If the app is snapped, try to unsnap it first. Only show the picker if it unsnaps.
             if (ApplicationView.Value != ApplicationViewState.Snapped || ApplicationView.TryUnsnap())
             {
                 var openPicker = new FileOpenPicker();
-                //openPicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+                openPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
                 //openPicker.ViewMode = PickerViewMode.Thumbnail;
-
-                // Filter to include a sample subset of file types.
                 openPicker.FileTypeFilter.Clear();
                 openPicker.FileTypeFilter.Add(".sgf");
-
-                // Open the file picker.
                 var file = await openPicker.PickSingleFileAsync();
 
-                // file is null if user cancels the file picker.
                 if (file != null)
                 {
                     var buffer = await FileIO.ReadBufferAsync(file);
@@ -154,8 +148,8 @@ namespace Kifu.Pages
                         string content = reader.ReadString(buffer.Length);
                         sgfContent.Text = content;
                     }
-                    this.DataContext = file;
 
+                    //this.DataContext = file;
                     //var mruToken = StorageApplicationPermissions.MostRecentlyUsedList.Add(file);
                 }
             }

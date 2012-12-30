@@ -40,16 +40,19 @@
     <Compile Include="Goban.cs" />
     <Compile Include="History.cs" />
     <Compile Include="Move.cs" />
+    <Compile Include="Moves.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Score.cs" />
     <Compile Include="SGF\SgfHelper.cs" />
-    <Compile Include="SGF\SgfReader.cs" />
+    <Compile Include="SGF\JsonParser.cs" />
+    <Compile Include="SGF\SgfParser.cs" />
     <Compile Include="SGF\SgfWriter.cs" />
     <Compile Include="Stone.cs" />
     <Compile Include="StoneGroup.cs" />
     <Compile Include="Territory.cs" />
+    <Compile Include="Utils\Tree.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

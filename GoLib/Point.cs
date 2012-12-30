@@ -61,6 +61,22 @@ namespace GoLib
             return !(a == b);
         }
 
+        public static Point Parse(char i, char j)
+        {
+            int x = Parse(i);
+            int y = Parse(j);
+            return new Point(x, y);
+        }
+
+        private static int Parse(char c)
+        {
+            if (char.IsLower(c))
+                return (int)(c - 'a');
+            if (char.IsUpper(c))
+                return (int)(c - 'A' + 26);
+            throw new FormatException();
+        }
+
         public static Point Empty
         {
             get { return new Point(-1, -1); }

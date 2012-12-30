@@ -11,6 +11,11 @@ namespace GoLib
         private HashSet<Stone> _captured;
         private Stone _ko;
 
+        public Move()
+            : this(null, null)
+        {
+        }
+
         public Move(Stone stone, HashSet<Stone> captured)
         {
             _stone = stone;
@@ -21,11 +26,13 @@ namespace GoLib
         public Stone Stone
         {
             get { return _stone; }
+            internal set { _stone = value; }
         }
 
         public HashSet<Stone> Captured
         {
             get { return _captured; }
+            internal set { _captured = value; }
         }
 
         public Stone Ko

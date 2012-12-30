@@ -12,6 +12,14 @@
 
     <Page.Resources>
     </Page.Resources>
+    
+    <!--
+    <common:LayoutAwarePage.BottomAppBar>
+        <AppBar>
+            <Button/>
+        </AppBar>
+    </common:LayoutAwarePage.BottomAppBar>
+    -->
 
     <!--
         This grid acts as a root panel for the page that defines two rows:

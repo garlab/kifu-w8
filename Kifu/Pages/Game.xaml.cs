@@ -1,28 +1,21 @@
-﻿using System;
+﻿using GoLib;
+using GoLib.SGF;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using Windows.Storage;
+using Windows.Storage.Pickers;
+using Windows.Storage.Streams;
 using Windows.UI;
+using Windows.UI.Core;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Shapes;
-using Windows.UI.Xaml.Media.Animation;
-using Windows.UI.ViewManagement;
-using Windows.UI.Core;
-using GoLib;
-using Windows.UI.Popups;
-using Windows.Storage.Pickers;
-using Windows.Storage;
-using Windows.Storage.Streams;
-using GoLib.SGF;
 
 // Pour en savoir plus sur le modèle d'élément Page de base, consultez la page http://go.microsoft.com/fwlink/?LinkId=234237
 
@@ -194,28 +187,33 @@ namespace Kifu.Pages
 
         private async void saveButton_Click(object sender, RoutedEventArgs e)
         {
-            var savePicker = new FileSavePicker();
-            savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
-            savePicker.FileTypeChoices.Add("Smart Game Format", new List<string>() { ".sgf" });
-            savePicker.DefaultFileExtension = ".sgf";
-            savePicker.SuggestedFileName = "Game " + new DateTime().ToString("u");
-            var savedItem = await savePicker.PickSaveFileAsync();
-
-            if (null != savedItem)
+            // File picker APIs don't work if the app is in a snapped state.
+            // If the app is snapped, try to unsnap it first. Only show the picker if it unsnaps.
+            if (ApplicationView.Value != ApplicationViewState.Snapped || ApplicationView.TryUnsnap())
             {
-                var content = SgfHelper.ToString(_goban);
-                var writeStream = await savedItem.OpenAsync(FileAccessMode.ReadWrite);
-                writeStream.Size = 0;
-                var oStream = writeStream.GetOutputStreamAt(0);
-                var dWriter = new DataWriter(oStream);
-                dWriter.WriteString(content);
+                var savePicker = new FileSavePicker();
+                savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+                savePicker.FileTypeChoices.Add("Smart Game Format", new List<string>() { ".sgf" });
+                savePicker.DefaultFileExtension = ".sgf";
+                savePicker.SuggestedFileName = "Game " + new DateTime().ToString("u");
+                var file = await savePicker.PickSaveFileAsync();
 
-                await dWriter.StoreAsync();
-                await oStream.FlushAsync();
-                
+                if (null != file) // file is null if user cancels the file picker.
+                {
+                    var content = SgfHelper.ToString(_goban);
+                    var writeStream = await file.OpenAsync(FileAccessMode.ReadWrite);
+                    writeStream.Size = 0;
+                    var oStream = writeStream.GetOutputStreamAt(0);
+                    var dWriter = new DataWriter(oStream);
+                    dWriter.WriteString(content);
+
+                    await dWriter.StoreAsync();
+                    await oStream.FlushAsync();
+
+                    //this.DataContext = file;
+                    //var mruToken = StorageApplicationPermissions.MostRecentlyUsedList.Add(file);
+                }
             }
-            //this.DataContext = savedItem;
-            //var mruToken = StorageApplicationPermissions.MostRecentlyUsedList.Add(savedItem);
         }
 
         private void replayButton_Click(object sender, RoutedEventArgs e)
@@ -271,7 +269,7 @@ namespace Kifu.Pages
 
         private void Move(Stone stone)
         {
-            if (_goban.isMoveValid(stone))
+            if (_goban.IsMoveValid(stone))
             {
                 Move move = _goban.Move(stone);
                 Draw(stone);

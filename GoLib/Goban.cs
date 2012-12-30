@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GoLib.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,17 +16,10 @@ namespace GoLib
         public static Colour OpponentColor(this Colour color)
         {
             if (color == Colour.Black)
-            {
                 return Colour.White;
-            }
             else if (color == Colour.White)
-            {
                 return Colour.Black;
-            }
-            else
-            {
-                return Colour.None;
-            }
+            return Colour.None;
         }
     }
 
@@ -37,6 +31,8 @@ namespace GoLib
         private Section[,] _board;
         private List<Move> _moves;
         private int[] _captured;
+        //private Tree<Move> _root;
+        //private Tree<Move> _current;
 
         public Goban(GameInfo info)
         {
@@ -148,7 +144,7 @@ namespace GoLib
 
         public int Round
         {
-            get { return _moves.Count; }
+            get { return _moves.Count; } // TODO: risque de perdre en fiabilité
         }
 
         public List<Move> Moves
@@ -218,7 +214,7 @@ namespace GoLib
             return _board[stone.Point.X, stone.Point.Y].stoneGroup;
         }
 
-        public bool isMoveValid(Stone stone)
+        public bool IsMoveValid(Stone stone)
         {
             if (isEmpty(stone.Point) && !isKo(stone))
             {

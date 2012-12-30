@@ -52,7 +52,7 @@ namespace AI
             foreach (var point in _goban.AllLiberties().OrderBy(a => Guid.NewGuid()))
             {
                 var stone = new Stone(_color, point);
-                if (_goban.isMoveValid(stone))
+                if (_goban.IsMoveValid(stone))
                 {
                     var value = Value(stone);
                     if (value > max)
