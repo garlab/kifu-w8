@@ -17,6 +17,37 @@ namespace AI
         private Colour _color;
         private Strategy _strategy;
 
+        #region tmp
+
+        public static event EventHandler CleanNow;
+        public static event EventHandler Changed;
+
+        protected void OnChanged(VStone sender, EventArgs e)
+        {
+            if (Changed != null)
+                Changed(sender, e);
+        }
+
+        protected void OnClean()
+        {
+            if (CleanNow != null)
+                CleanNow(this, EventArgs.Empty);
+        }
+
+        public class VStone
+        {
+            public VStone(double v, Point p)
+            {
+                Value = v;
+                Point = p;
+            }
+
+            public double Value { get; set; }
+            public Point Point { get; set; }
+        }
+
+        #endregion
+
         public WeakAI(Goban goban, Colour color)
         {
             _goban = goban;
@@ -49,12 +80,14 @@ namespace AI
             double max = -1;
             Stone best = null;
 
+            OnClean();
             foreach (var point in _goban.AllLiberties().OrderBy(a => Guid.NewGuid()))
             {
                 var stone = new Stone(_color, point);
                 if (_goban.IsMoveValid(stone))
                 {
                     var value = Value(stone);
+                    OnChanged(new VStone(value, stone.Point), EventArgs.Empty);
                     if (value > max)
                     {
                         max = value;
@@ -63,51 +96,6 @@ namespace AI
                 }
             }
             return best;
-        }
-
-        private double ValueOld(Stone stone)
-        {
-            double value = 0;
-
-            int numberOfliberties = _goban.ActualLiberties(stone).Count;
-            int neighborLiberties = ActualNeigborLiberties(stone).Count;
-
-            if (neighborLiberties != 0)
-            {
-                value += (double)(numberOfliberties / neighborLiberties) / 8;
-            }
-
-            int capture = 0;
-            
-
-            foreach (var group in _goban.GroupNeighbors(stone))
-            {
-                if (group.Color == _color)
-                {
-                    if (group.Liberties.Count == 1 && neighborLiberties > 1)
-                    {
-                        capture += group.Stones.Count;
-                        value += group.Stones.Count * 2;
-                    }
-                    else if (group.Color == _color.OpponentColor())
-                    {
-                        if (group.Liberties.Count == 1)
-                        {
-                            value += group.Stones.Count * 2;
-                        }
-                        else if (numberOfliberties > 1)
-                        {
-                            value += (double)(group.Stones.Count * 2) / (double)(group.Liberties.Count - 1);
-                        }
-                    }
-                }
-
-                if (numberOfliberties == 1 && capture <= 1)
-                {
-                    value = capture - 1;
-                }
-            }
-            return value;
         }
 
         public double Value(Stone stone)

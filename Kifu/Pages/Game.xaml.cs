@@ -1,8 +1,10 @@
-﻿using GoLib;
+﻿using AI;
+using GoLib;
 using GoLib.SGF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Windows.Foundation;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
@@ -78,6 +80,8 @@ namespace Kifu.Pages
             Window.Current.SizeChanged += Current_SizeChanged;
             StoneGroup.Changed += StoneGroup_Changed;
             Territory.Changed += Territory_Changed;
+            //WeakAI.Changed += AI_Changed;
+            //WeakAI.CleanNow += AI_CleanNow;
 
             _black = new Color();
             _white = new Color();
@@ -98,6 +102,49 @@ namespace Kifu.Pages
             _territories = new Rectangle[info.Size, info.Size];
             _state = GameState.Ongoing;
         }
+
+        #region AI values display
+
+        /*
+        private List<TextBlock> tbs = new List<TextBlock>();
+
+        private void AI_CleanNow(object sender, EventArgs e)
+        {
+            foreach (var tb in tbs)
+            {
+                gobanCanvas.Children.Remove(tb);
+            }
+            tbs.Clear();
+        }
+
+        private void AI_Changed(object sender, EventArgs e)
+        {
+            var vs = sender as WeakAI.VStone;
+            if (vs != null)
+            {
+                string val = vs.Value.ToString();
+                Draw(vs.Point, val.Substring(0, val.Length > 5 ? 5 : val.Length));
+            }
+        }
+
+        private void Draw(GoLib.Point point, string text)
+        {
+            var label = Label(point, text);
+            tbs.Add(label);
+            Canvas.SetZIndex(label, 999);
+            gobanCanvas.Children.Add(label);
+        }
+
+        private TextBlock Label(GoLib.Point point, string text)
+        {
+            var label = new TextBlock();
+            label.Text = text;
+            label.FontSize = SectionSize / 4;
+            Fit(label, Convert(point));
+            return label;
+        }
+        //*/
+        #endregion
 
         #region events
 
@@ -176,6 +223,7 @@ namespace Kifu.Pages
 
         private void submitButton_Click(object sender, RoutedEventArgs e)
         {
+            // TODO: tester si le goban n'est pas vide (bug #1)
             State = GameState.Finished;
             Score score = _goban.Score;
             score.ComputeScore(); // TODO: calculer le score au fur et à mesure
@@ -219,6 +267,7 @@ namespace Kifu.Pages
         private void replayButton_Click(object sender, RoutedEventArgs e)
         {
             _goban.Clear();
+            AIMove();
             State = GameState.Ongoing;
         }
 
@@ -496,7 +545,7 @@ namespace Kifu.Pages
 
         private void Fit(FrameworkElement e, Windows.Foundation.Point point)
         {
-            double gap = (SectionSize - e.Height) / 2;
+            double gap = (SectionSize - e.ActualHeight) / 2;
             Canvas.SetLeft(e, point.X + gap);
             Canvas.SetTop(e, point.Y + gap);
         }
