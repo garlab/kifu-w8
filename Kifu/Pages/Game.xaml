@@ -12,14 +12,33 @@
 
     <Page.Resources>
     </Page.Resources>
-    
-    <!--
+
     <common:LayoutAwarePage.BottomAppBar>
-        <AppBar>
-            <Button/>
+        <AppBar IsOpen="True">
+            <Grid>
+                <StackPanel Orientation="Horizontal">
+
+                    <Button x:Name="replayButton" Style="{StaticResource ReplayAppBarButtonStyle}" Click="replayButton_Click"/>
+                    <!--<Button x:Name="newGameButton" Style="{StaticResource AddAppBarButtonStyle}" Click="newGameButton_Click"/>-->
+                    <Button x:Name="openGameButton" Style="{StaticResource OpenLocalAppBarButtonStyle}" Click="openGameButton_Click"/>
+                    <Button x:Name="saveGameButton" Style="{StaticResource SaveAppBarButtonStyle}" Click="saveButton_Click"/>
+
+                    <Button x:Name="passButton" Style="{StaticResource PassAppBarButtonStyle}" Click="passButton_Click"/>
+                    <Button x:Name="undoButton" Style="{StaticResource UndoAppBarButtonStyle}" Click="undoButton_Click" IsEnabled="False"/>
+                    <Button x:Name="giveUpButton" Style="{StaticResource GiveUpAppBarButtonStyle}" Click="giveUpButton_Click"/>
+
+                    <Button x:Name="submitButton" Style="{StaticResource SubmitAppBarButtonStyle}" Click="submitButton_Click" IsEnabled="False"/>
+                </StackPanel>
+                <!--
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="firstButton" Content="First"  Click="GoFirst"/>
+                    <Button x:Name="prevButton" Content="Prev"  Click="GoPrev"/>
+                    <Button x:Name="nextButton" Content="Next"  Click="GoNext"/>
+                    <Button x:Name="lastButton" Content="Last"  Click="GoLast"/>
+                </StackPanel>-->
+            </Grid>
         </AppBar>
     </common:LayoutAwarePage.BottomAppBar>
-    -->
 
     <!--
         This grid acts as a root panel for the page that defines two rows:
@@ -30,7 +49,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="140"/>
             <RowDefinition x:Name="content" Height="*"/>
-            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
         <!-- Back button and page title -->
@@ -43,7 +61,7 @@
             <TextBlock x:Name="pageTitle" Grid.Column="1" x:Uid="AppName" Style="{StaticResource PageHeaderTextStyle}"/>
         </Grid>
 
-        
+
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -61,20 +79,8 @@
                             <WrapGrid Orientation="Horizontal" MaximumRowsOrColumns="2"/>
                         </ItemsPanelTemplate>
                     </GridView.ItemsPanel>
-                    <Button x:Name="passButton" x:Uid="Pass" Click="passButton_Click" Width="115"/>
-                    <Button x:Name="undoButton" x:Uid="Undo" Click="undoButton_Click" Width="115" IsEnabled="False"/>
-                    <Button x:Name="giveUpButton" x:Uid="GiveUp" Click="giveUpButton_Click" Width="115"/>
-                    <Button x:Name="submitButton" x:Uid="Submit" Click="submitButton_Click" Width="115" IsEnabled="False"/>
-                    <Button x:Name="replayButton" x:Uid="Replay" Click="replayButton_Click" Width="115"/>
-                    <Button x:Name="saveButton" x:Uid="Save" Click="saveButton_Click" Width="115"/>
                 </GridView>
-                <!--
-                <StackPanel Orientation="Horizontal">
-                    <Button x:Name="firstButton" Content="First"  Click="GoFirst"/>
-                    <Button x:Name="prevButton" Content="Prev"  Click="GoPrev"/>
-                    <Button x:Name="nextButton" Content="Next"  Click="GoNext"/>
-                    <Button x:Name="lastButton" Content="Last"  Click="GoLast"/>
-                </StackPanel>-->
+
 
                 <Grid Margin="20,20,20,20">
                     <Grid.RowDefinitions>
@@ -104,13 +110,13 @@
                 </Grid>
             </StackPanel>
 
-            <Canvas x:Name="gobanCanvas" Loaded="GobanCanvas_Loaded" PointerReleased="Canvas_PointerReleased">
+            <Canvas x:Name="gobanCanvas" Loaded="GobanCanvas_Loaded" PointerReleased="Canvas_PointerReleased" Margin="0, -188, 0, 0">
                 <Canvas.Background>
                     <ImageBrush ImageSource="ms-appx:///Assets/Board.png"/>
                 </Canvas.Background>
             </Canvas>
         </Grid>
-        
+
         <!--<TextBlock Grid.Row="2" x:Name="statusBar" Text="Black to play" HorizontalAlignment="Center" FontSize="16" Padding="5"/>-->
 
         <VisualStateManager.VisualStateGroups>
@@ -126,7 +132,7 @@
                         </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>
-                
+
                 <VisualState x:Name="Filled">
                     <Storyboard>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="gobanCanvas" Storyboard.TargetProperty="(Grid.Column)">

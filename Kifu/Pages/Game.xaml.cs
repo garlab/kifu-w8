@@ -1,10 +1,8 @@
-﻿using AI;
-using GoLib;
+﻿using GoLib;
 using GoLib.SGF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Windows.Foundation;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
@@ -16,10 +14,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Shapes;
-
-// Pour en savoir plus sur le modèle d'élément Page de base, consultez la page http://go.microsoft.com/fwlink/?LinkId=234237
 
 namespace Kifu.Pages
 {
@@ -35,9 +30,6 @@ namespace Kifu.Pages
         private Image[,] _stones;
         private Rectangle[,] _territories;
         private Ellipse _marker;
-        private Color _black;
-        private Color _white;
-        private Color _shared;
 
         #region properties
 
@@ -83,19 +75,6 @@ namespace Kifu.Pages
             //WeakAI.Changed += AI_Changed;
             //WeakAI.CleanNow += AI_CleanNow;
 
-            _black = new Color();
-            _white = new Color();
-            _black.A = _white.A = 255;
-            _white.R = _white.G = _white.B = 255;
-            _shared = new Color();
-            _shared.A = 0;
-            _shared.R = 255;
-            _shared.G = _shared.B = 120;
-        }
-
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            base.OnNavigatedTo(e);
             var info = GameForm.Info();
             _goban = new Goban(info);
             _stones = new Image[info.Size, info.Size];
@@ -233,6 +212,16 @@ namespace Kifu.Pages
             resultUi.Text = score.Result;
         }
 
+        private void openGameButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void newGameButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         private async void saveButton_Click(object sender, RoutedEventArgs e)
         {
             // File picker APIs don't work if the app is in a snapped state.
@@ -243,7 +232,7 @@ namespace Kifu.Pages
                 savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
                 savePicker.FileTypeChoices.Add("Smart Game Format", new List<string>() { ".sgf" });
                 savePicker.DefaultFileExtension = ".sgf";
-                savePicker.SuggestedFileName = "Game " + new DateTime().ToString("u");
+                savePicker.SuggestedFileName = "Game " + DateTime.Now.ToString("u");
                 var file = await savePicker.PickSaveFileAsync();
 
                 if (null != file) // file is null if user cancels the file picker.
@@ -404,7 +393,7 @@ namespace Kifu.Pages
 
         private void DrawGrids()
         {
-            var brush = new SolidColorBrush(_black);
+            var brush = new SolidColorBrush(Colors.Black);
 
             for (var i = 0; i < _goban.Info.Size; ++i)
             {
@@ -538,7 +527,7 @@ namespace Kifu.Pages
         {
             var hoshi = new Ellipse();
             hoshi.Width = hoshi.Height = SectionSize * 0.15;
-            hoshi.Fill = new SolidColorBrush(_black);
+            hoshi.Fill = new SolidColorBrush(Colors.Black);
             Fit(hoshi, Convert(point));
             return hoshi;
         }
@@ -556,7 +545,7 @@ namespace Kifu.Pages
 
         private Color Convert(Colour colour)
         {
-            return colour == Colour.Black ? _black : colour == Colour.White ? _white : _shared;
+            return colour == Colour.Black ? Colors.Black : colour == Colour.White ? Colors.White : Colors.Transparent;
         }
 
         public GoLib.Point Convert(Windows.Foundation.Point p)

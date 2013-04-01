@@ -7,13 +7,32 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-
-                <!-- 
-                    Styles définissant l'apparence globale de la plateforme
-                    Requis par les modèles de projets et les modèles d'éléments Visual Studio
-                 -->
                 <ResourceDictionary Source="Common/StandardStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="ReplayAppBarButtonStyle" TargetType="ButtonBase" BasedOn="{StaticResource AppBarButtonStyle}">
+                <Setter Property="AutomationProperties.AutomationId" Value="ReplayAppBarButton"/>
+                <Setter Property="AutomationProperties.Name" Value="Replay"/>
+                <Setter Property="Content" Value="&#xE149;"/>
+            </Style>
+            
+            <Style x:Key="PassAppBarButtonStyle" TargetType="ButtonBase" BasedOn="{StaticResource AppBarButtonStyle}">
+                <Setter Property="AutomationProperties.AutomationId" Value="PassAppBarButton"/>
+                <Setter Property="AutomationProperties.Name" Value="Pass"/>
+                <Setter Property="Content" Value="&#xE143;"/>
+            </Style>
+
+            <Style x:Key="GiveUpAppBarButtonStyle" TargetType="ButtonBase" BasedOn="{StaticResource AppBarButtonStyle}">
+                <Setter Property="AutomationProperties.AutomationId" Value="GiveUpAppBarButton"/>
+                <Setter Property="AutomationProperties.Name" Value="Give up"/>
+                <Setter Property="Content" Value="&#xE15B;"/>
+            </Style>
+
+            <Style x:Key="SubmitAppBarButtonStyle" TargetType="ButtonBase" BasedOn="{StaticResource AppBarButtonStyle}">
+                <Setter Property="AutomationProperties.AutomationId" Value="SubmitAppBarButton"/>
+                <Setter Property="AutomationProperties.Name" Value="Submit"/>
+                <Setter Property="Content" Value="&#xE10B;"/>
+            </Style>
 
         </ResourceDictionary>
     </Application.Resources>
