@@ -358,13 +358,14 @@
     <MainPackageIdentityName>11582AnthonyGarcia.CardDav</MainPackageIdentityName>
     <MainPackageIdentityName>11582AnthonyGarcia.couinche</MainPackageIdentityName>
     <MainPackageIdentityName>11582AnthonyGarcia.Conquest</MainPackageIdentityName>
+    <MainPackageIdentityName>11582AnthonyGarcia.Socket</MainPackageIdentityName>
     <MainPackageIdentityName>11582AnthonyGarcia.Subsonic</MainPackageIdentityName>
     <MainPackageIdentityName>11582AnthonyGarcia.Xiangqi</MainPackageIdentityName>
   </AccountPackageIdentityNames>
   <PackageInfoList LandingUrl="https://appdev.microsoft.com:443/StorePortals/Developer/Catalog/ReleaseAnchor/64b4ef33-c652-4b7e-b794-559f506f9d7c">
     <PackageInfo>
       <PackageArchitecture>neutral</PackageArchitecture>
-      <PackageMaxArchitectureVersion>1.0.0.8</PackageMaxArchitectureVersion>
+      <PackageMaxArchitectureVersion>1.0.0.9</PackageMaxArchitectureVersion>
     </PackageInfo>
   </PackageInfoList>
 </StoreAssociation>
