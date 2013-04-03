@@ -78,10 +78,12 @@
                 <Button Grid.Row="5" Grid.Column="1" x:Name="playButton" x:Uid="PlayButton" Click="playButton_Click"/>
             </Grid>
             
+            <!--
             <StackPanel Grid.Column="1" HorizontalAlignment="Center">
                 <Button x:Name="pickSgfButton" Content="Pick SGF" Click="pickSgfButton_Click"/>
                 <TextBlock x:Name="sgfContent" Text="Vide"/>
             </StackPanel>
+            -->
         </Grid>
 
         <VisualStateManager.VisualStateGroups>

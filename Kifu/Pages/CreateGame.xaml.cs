@@ -146,7 +146,7 @@ namespace Kifu.Pages
                     using (var reader = DataReader.FromBuffer(buffer))
                     {
                         string content = reader.ReadString(buffer.Length);
-                        sgfContent.Text = content;
+                        //sgfContent.Text = content;
                     }
 
                     //this.DataContext = file;

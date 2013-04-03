@@ -34,6 +34,11 @@
                 <Setter Property="Content" Value="&#xE10B;"/>
             </Style>
 
+            <Style x:Key="OpenAppBarButtonStyle" TargetType="ButtonBase" BasedOn="{StaticResource OpenLocalAppBarButtonStyle}">
+                <Setter Property="AutomationProperties.AutomationId" Value="OpenAppBarButton"/>
+                <Setter Property="AutomationProperties.Name" Value="Open file"/>
+            </Style>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

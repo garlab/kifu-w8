@@ -62,7 +62,7 @@ namespace GoLib
             {
                 _score[(int)move.Stone.Color.OpponentColor() - 1].captured += move.Captured.Count;
             }
-            foreach (var territory in _goban.Territories.Where(t => t.Color != Colour.Shared))
+            foreach (var territory in _goban.Territories.Where(t => t.Color != Colour.Shared && t.Color != Colour.None)) // TODO: remplacer ce workaround par un test en amont
             {
                 _score[(int)territory.Color - 1].territories += territory.Points.Count;
             }

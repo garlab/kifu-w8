@@ -1,5 +1,6 @@
 ﻿using GoLib;
 using GoLib.SGF;
+using Kifu.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,7 @@ using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Core;
+using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -80,6 +82,18 @@ namespace Kifu.Pages
             _stones = new Image[info.Size, info.Size];
             _territories = new Rectangle[info.Size, info.Size];
             _state = GameState.Ongoing;
+        }
+
+        // handles the Click event of the Button for showing the light dismiss with animations behavior
+        private void ShowPopupAnimationClicked(object sender, RoutedEventArgs e)
+        {
+            //if (!LightDismissAnimatedPopup.IsOpen) { LightDismissAnimatedPopup.IsOpen = true; }
+        }
+
+        // Handles the Click event on the Button within the simple Popup control and simply closes it.
+        private void CloseAnimatedPopupClicked(object sender, RoutedEventArgs e)
+        {
+            //if (LightDismissAnimatedPopup.IsOpen) { LightDismissAnimatedPopup.IsOpen = false; }
         }
 
         #region AI values display
@@ -196,8 +210,7 @@ namespace Kifu.Pages
             State = GameState.Finished;
             Score score = _goban.Score;
             score.GiveUp(_goban.CurrentColour.OpponentColor());
-            winnerUi.Text = score.Winner.ToString();
-            resultUi.Text = score.Result;
+            ShowMessageDialog(_goban.CurrentColour.ToString() + " resign", score.Winner.ToString(), score.Result);
         }
 
         private void submitButton_Click(object sender, RoutedEventArgs e)
@@ -208,8 +221,7 @@ namespace Kifu.Pages
             score.ComputeScore(); // TODO: calculer le score au fur et à mesure
             blackScoreUi.Text = score.Get(Colour.Black).ToString();
             whiteScoreUi.Text = score.Get(Colour.White).ToString();
-            winnerUi.Text = score.Winner.ToString();
-            resultUi.Text = score.Result;
+            ShowMessageDialog("Game over", score.Winner.ToString(), score.Result);
         }
 
         private void openGameButton_Click(object sender, RoutedEventArgs e)
@@ -255,9 +267,7 @@ namespace Kifu.Pages
 
         private void replayButton_Click(object sender, RoutedEventArgs e)
         {
-            _goban.Clear();
-            AIMove();
-            State = GameState.Ongoing;
+            Replay();
         }
 
         private void Territory_Changed(object sender, EventArgs e)
@@ -311,10 +321,7 @@ namespace Kifu.Pages
             {
                 Move move = _goban.Move(stone);
                 Draw(stone);
-                foreach (var captured in move.Captured)
-                {
-                    UnDraw(captured);
-                }
+                move.Captured.Each(UnDraw);
                 UpdateCaptured(stone.Color, move.Captured.Count); // TODO: Move into goban.move
                 undoButton.IsEnabled = true;
                 DrawMarker();
@@ -369,6 +376,31 @@ namespace Kifu.Pages
         private void MarkGroup(GoLib.Point point)
         {
             _goban.MarkDead(point);
+        }
+
+        private void Replay()
+        {
+            _goban.Clear();
+            AIMove();
+            State = GameState.Ongoing;
+        }
+
+        private async void ShowMessageDialog(string title, string winner, string result)
+        {
+            var messageDialog = new MessageDialog(string.Format("{0} win by {1}", winner, result), title) { DefaultCommandIndex = 1 };
+            messageDialog.Commands.Add(new UICommand("Show board", null, 0));
+            messageDialog.Commands.Add(new UICommand("Play again", null, 1));
+
+
+            var commandChosen = await messageDialog.ShowAsync();
+            if ((int)commandChosen.Id == 1)
+            {
+                Replay();
+            }
+            else
+            {
+                // TODO: add move review
+            }
         }
 
         #endregion
