@@ -10,6 +10,16 @@
                 <ResourceDictionary Source="Common/StandardStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
+            <Style x:Key="NewGameTextBlockStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="17"/>
+                <Setter Property="Margin" Value="7"/>
+            </Style>
+
+            <Style x:Key="NewGameComboBoxStyle" TargetType="ComboBox">
+                <Setter Property="Width" Value="120"/>
+                <Setter Property="Margin" Value="7"/>
+            </Style>
+
             <Style x:Key="ReplayAppBarButtonStyle" TargetType="ButtonBase" BasedOn="{StaticResource AppBarButtonStyle}">
                 <Setter Property="AutomationProperties.AutomationId" Value="ReplayAppBarButton"/>
                 <Setter Property="AutomationProperties.Name" Value="Replay"/>

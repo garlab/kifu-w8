@@ -1,24 +1,13 @@
 ﻿using GoLib;
 using Kifu.Common;
+using Kifu.Utils;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Storage;
-using Windows.Storage.AccessCache;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Xaml.Navigation;
 
 namespace Kifu.Pages
 {
@@ -26,29 +15,28 @@ namespace Kifu.Pages
     {
         public static GameInfo Info()
         {
-            var localsettings = ApplicationData.Current.LocalSettings;
             var info = new GameInfo();
-            info.Handicap = int.Parse(localsettings.Values["handicap"].ToString());
-            info.Players[0].IsHuman = IsHuman(localsettings.Values["black"].ToString());
-            info.Players[1].IsHuman = IsHuman(localsettings.Values["white"].ToString());
-            info.Rule = Rule(localsettings.Values["rules"].ToString());
-            info.Size = Size(localsettings.Values["size"].ToString());
+            info.Handicap = Settings.Handicap;
+            info.Players[0].IsHuman = IsHuman(Settings.Black);
+            info.Players[1].IsHuman = IsHuman(Settings.White);
+            info.Rule = Rule(Settings.Rules);
+            info.Size = Size(Settings.Size);
             return info;
         }
 
-        public static bool IsHuman(String player)
+        public static bool IsHuman(string player)
         {
             return player == "Human";
         }
 
-        public static int Size(String value)
+        public static int Size(string value)
         {
             if (value == "13x13") return 13;
             if (value == "9x9") return 9;
             return 19;
         }
 
-        public static Rules Rule(String rules)
+        public static Rules Rule(string rules)
         {
             // TODO: faire une methode de parsing générique avec le parser sgf
             return rules == "Chinese" ? Rules.Chinese : Rules.Japanese;
@@ -57,8 +45,6 @@ namespace Kifu.Pages
 
     public sealed partial class CreateGame : LayoutAwarePage
     {
-        private ApplicationDataContainer _settings = ApplicationData.Current.LocalSettings;
-
         public CreateGame()
         {
             this.InitializeComponent();
@@ -68,12 +54,11 @@ namespace Kifu.Pages
         {
             if (this.Frame != null)
             {
-                var localsettings = ApplicationData.Current.LocalSettings;
-                localsettings.Values["black"] = BlackPlayerView.SelectedValue;
-                localsettings.Values["white"] = WhitePlayerView.SelectedValue;
-                localsettings.Values["size"] = SizeView.SelectedValue;
-                localsettings.Values["handicap"] = HandicapView.Value;
-                localsettings.Values["rules"] = RuleView.SelectedValue;
+                Settings.Black = BlackPlayerView.SelectedValue.ToString();
+                Settings.White = WhitePlayerView.SelectedValue.ToString();
+                Settings.Size = SizeView.SelectedValue.ToString();
+                Settings.Handicap = (int)HandicapView.Value;
+                Settings.Rules = RuleView.SelectedValue.ToString();
                 this.Frame.Navigate(typeof(Game));
             }
         }
@@ -83,50 +68,34 @@ namespace Kifu.Pages
             var box = sender as ComboBox;
             if (box != null && !GameForm.IsHuman(box.SelectedValue.ToString()))
             {
-                Init(box == BlackPlayerView ? WhitePlayerView : BlackPlayerView);
+                var opponent = box == BlackPlayerView ? WhitePlayerView : BlackPlayerView;
+                opponent.SelectedIndex = 0;
             }
         }
 
         private void Black_Loaded(object sender, RoutedEventArgs e)
         {
-            if (_settings.Values["black"] == null)
-                Init(BlackPlayerView);
-            else
-                BlackPlayerView.SelectedValue = _settings.Values["black"];
+            BlackPlayerView.SelectedValue = Settings.Black;
         }
 
         private void White_Loaded(object sender, RoutedEventArgs e)
         {
-            if (_settings.Values["white"] == null)
-                Init(WhitePlayerView);
-            else
-                WhitePlayerView.SelectedValue = _settings.Values["white"];
+            WhitePlayerView.SelectedValue = Settings.White;
         }
 
         private void Size_Loaded(object sender, RoutedEventArgs e)
         {
-            if (_settings.Values["size"] == null)
-                Init(SizeView);
-            else
-                SizeView.SelectedValue = _settings.Values["size"];
+            SizeView.SelectedValue = Settings.Size;
         }
 
         private void Handicap_Loaded(object sender, RoutedEventArgs e)
         {
-            HandicapView.Value = _settings.Values["handicap"] == null ? 0 : int.Parse(_settings.Values["handicap"].ToString());
+            HandicapView.Value = Settings.Handicap;
         }
 
         private void Rules_Loaded(object sender, RoutedEventArgs e)
         {
-            if (_settings.Values["rules"] == null)
-                Init(RuleView);
-            else
-                RuleView.SelectedValue = _settings.Values["rules"];
-        }
-
-        private void Init(ComboBox box)
-        {
-            box.SelectedIndex = 0;
+            RuleView.SelectedValue = Settings.Rules;
         }
 
         private async void pickSgfButton_Click(object sender, RoutedEventArgs e)

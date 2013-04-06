@@ -129,9 +129,7 @@
       <DependentUpon>Game.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Pages\PlayerUserControl.xaml.cs">
-      <DependentUpon>PlayerUserControl.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Utils\Settings.cs" />
     <Compile Include="Utils\XLinq.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -186,15 +184,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\Game.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Style.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Page>
-    <Page Include="Pages\PlayerUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

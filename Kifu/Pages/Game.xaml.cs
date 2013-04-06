@@ -85,25 +85,27 @@ namespace Kifu.Pages
             _state = GameState.Ongoing;
         }
 
-        /*
-        // handles the Click event of the Button for showing the light dismiss with animations behavior
-        private void ShowPopupAnimationClicked(object sender, RoutedEventArgs e)
+        #region NewGamePopup
+
+        private void NewGamePopup_Clicked(object sender, RoutedEventArgs e)
         {
-            if (!LightDismissAnimatedPopup.IsOpen)
+            if (!NewGamePopup.IsOpen)
             {
-                double w = (Window.Current.Bounds.Width + 200) / 2;
-                double h = (Window.Current.Bounds.Height + 200) / 2;
-                LightDismissAnimatedPopup.HorizontalAlignment = HorizontalAlignment.Center;
-                LightDismissAnimatedPopup.VerticalAlignment = VerticalAlignment.Center;
-                LightDismissAnimatedPopup.IsOpen = true;
+                NewGamePopup.HorizontalAlignment = HorizontalAlignment.Center;
+                NewGamePopup.HorizontalOffset = -100;
+
+                NewGamePopup.VerticalOffset = Window.Current.Bounds.Height / 2 - 100;
+
+                NewGamePopup.IsOpen = true;
             }
         }
 
-        // Handles the Click event on the Button within the simple Popup control and simply closes it.
-        private void CloseAnimatedPopupClicked(object sender, RoutedEventArgs e)
+        private void CloseNewGamePopup_Clicked(object sender, RoutedEventArgs e)
         {
-            if (LightDismissAnimatedPopup.IsOpen) { LightDismissAnimatedPopup.IsOpen = false; }
-        }*/
+            if (NewGamePopup.IsOpen) { NewGamePopup.IsOpen = false; }
+        }
+
+        #endregion
 
         #region AI values display
 
@@ -606,5 +608,6 @@ namespace Kifu.Pages
         }
 
         #endregion
+
     }
 }
