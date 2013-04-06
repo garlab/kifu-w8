@@ -16,17 +16,15 @@
     <common:LayoutAwarePage.BottomAppBar>
         <AppBar IsOpen="True">
             <Grid>
-                <StackPanel Orientation="Horizontal">
-
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                     <Button x:Name="replayButton" Style="{StaticResource ReplayAppBarButtonStyle}" Click="replayButton_Click"/>
-                    <!--<Button x:Name="newGameButton" Style="{StaticResource AddAppBarButtonStyle}" Click="newGameButton_Click"/>-->
                     <Button x:Name="openGameButton" Style="{StaticResource OpenAppBarButtonStyle}" Click="openGameButton_Click"/>
                     <Button x:Name="saveGameButton" Style="{StaticResource SaveAppBarButtonStyle}" Click="saveButton_Click"/>
-
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button x:Name="passButton" Style="{StaticResource PassAppBarButtonStyle}" Click="passButton_Click"/>
                     <Button x:Name="undoButton" Style="{StaticResource UndoAppBarButtonStyle}" Click="undoButton_Click" IsEnabled="False"/>
                     <Button x:Name="giveUpButton" Style="{StaticResource GiveUpAppBarButtonStyle}" Click="giveUpButton_Click"/>
-
                     <Button x:Name="submitButton" Style="{StaticResource SubmitAppBarButtonStyle}" Click="submitButton_Click" IsEnabled="False"/>
                 </StackPanel>
                 <!--
@@ -61,50 +59,38 @@
             <TextBlock x:Name="pageTitle" Grid.Column="1" x:Uid="AppName" Style="{StaticResource PageHeaderTextStyle}"/>
         </Grid>
 
-
         <Grid Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="320"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="320"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel x:Name="actions" Orientation="Vertical">
+            <Border x:Name="blackBorder" Grid.Column="0" BorderBrush="Azure" BorderThickness="3" Height="200" Width="200" Margin="16" HorizontalAlignment="Center">
+                <Grid>
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                        <TextBlock Text="Black" FontSize="26"/>
+                        <Image Source="ms-appx:///Assets/StoneBlack.png" Width="53"/>
+                        <TextBlock x:Uid="BlackScore" FontSize="14" Margin="5"/>
+                        <TextBlock x:Name="blackScoreUi" FontSize="14" Margin="5"/>
+                        <TextBlock x:Uid="BlackCaptured" FontSize="14" Margin="5"/>
+                        <TextBlock x:Name="blackCapturedUi" FontSize="14" Margin="5"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
 
-                    <TextBlock x:Uid="BlackScore" FontSize="14" Margin="5"/>
-                    <TextBlock x:Name="blackScoreUi" FontSize="14" Margin="5"/>
-                    <TextBlock x:Uid="WhiteScore" FontSize="14" Margin="5"/>
-                    <TextBlock x:Name="whiteScoreUi" FontSize="14" Margin="5"/>
-                    <TextBlock x:Uid="BlackCaptured" FontSize="14" Margin="5"/>
-                    <TextBlock x:Name="blackCapturedUi" FontSize="14" Margin="5"/>
-                    <TextBlock x:Uid="WhiteCaptured" FontSize="14" Margin="5"/>
-                    <TextBlock x:Name="whiteCapturedUi" FontSize="14" Margin="5"/>
-
-                <!--
-                <Button Content="Show Popup (with light dismiss and animations)" Click="ShowPopupAnimationClicked" />
-                <Popup x:Name="LightDismissAnimatedPopup" HorizontalOffset="200" VerticalOffset="10" IsLightDismissEnabled="True">
-                    <Popup.ChildTransitions>
-                        <TransitionCollection>
-                            <PopupThemeTransition />
-                        </TransitionCollection>
-                    </Popup.ChildTransitions>
-                    <Border BorderBrush="{StaticResource ApplicationForegroundThemeBrush}" BorderThickness="2" Background="{StaticResource ApplicationPageBackgroundThemeBrush}" Width="200" Height="200">
-                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBlock Text="Simple Popup" FontSize="24.667" HorizontalAlignment="Center" />
-                            <Button Content="Close" Click="CloseAnimatedPopupClicked" HorizontalAlignment="Center" />
-                        </StackPanel>
-                    </Border>
-                </Popup>
-                -->
-
-                <!--<local:PlayerUserControl x:Name="MyHelloWorldUserControl" />-->
-
-
-            </StackPanel>
+            <Border x:Name="whiteBorder" Grid.Column="2" BorderBrush="Azure" BorderThickness="3" Height="200" Width="200" Margin="16" HorizontalAlignment="Center">
+                <Grid>
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                        <TextBlock Text="White" FontSize="26"/>
+                        <Image Source="ms-appx:///Assets/StoneWhite.png" Width="53"/>
+                        <TextBlock x:Uid="WhiteScore" FontSize="14" Margin="5"/>
+                        <TextBlock x:Name="whiteScoreUi" FontSize="14" Margin="5"/>
+                        <TextBlock x:Uid="WhiteCaptured" FontSize="14" Margin="5"/>
+                        <TextBlock x:Name="whiteCapturedUi" FontSize="14" Margin="5"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
 
             <Canvas x:Name="gobanCanvas" Loaded="GobanCanvas_Loaded" PointerReleased="Canvas_PointerReleased" Margin="0, -188, 0, 0">
                 <Canvas.Background>
@@ -113,7 +99,24 @@
             </Canvas>
         </Grid>
 
-        <!--<TextBlock Grid.Row="2" x:Name="statusBar" Text="Black to play" HorizontalAlignment="Center" FontSize="16" Padding="5"/>-->
+        <!--
+            <Popup x:Name="LightDismissAnimatedPopup" IsLightDismissEnabled="True" Grid.Column="1">
+                <Popup.ChildTransitions>
+                    <TransitionCollection>
+                        <PopupThemeTransition />
+                    </TransitionCollection>
+                </Popup.ChildTransitions>
+                <Border BorderBrush="{StaticResource ApplicationForegroundThemeBrush}" BorderThickness="2" Background="{StaticResource ApplicationPageBackgroundThemeBrush}" Width="200" Height="200">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="Simple Popup" FontSize="24.667" HorizontalAlignment="Center" />
+                        <Button Content="Close" Click="CloseAnimatedPopupClicked" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+            </Popup>
+
+
+            <Button Content="Show Popup (with light dismiss and animations)" Click="ShowPopupAnimationClicked" />
+            -->
 
         <VisualStateManager.VisualStateGroups>
 
@@ -123,8 +126,11 @@
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="gobanCanvas" Storyboard.TargetProperty="(Grid.Column)">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="1"/>
                         </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="actions" Storyboard.TargetProperty="(Grid.Row)">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="blackBorder" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Visible"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="whiteBorder" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Visible"/>
                         </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>
@@ -134,8 +140,11 @@
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="gobanCanvas" Storyboard.TargetProperty="(Grid.Column)">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="1"/>
                         </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="actions" Storyboard.TargetProperty="(Grid.Row)">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="blackBorder" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Visible"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="whiteBorder" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Visible"/>
                         </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>
@@ -149,8 +158,11 @@
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="gobanCanvas" Storyboard.TargetProperty="(Grid.Column)">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="1"/>
                         </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="actions" Storyboard.TargetProperty="(Grid.Row)">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="blackBorder" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Visible"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="whiteBorder" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Visible"/>
                         </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>
@@ -166,8 +178,11 @@
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="gobanCanvas" Storyboard.TargetProperty="(Grid.Column)">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="0"/>
                         </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="actions" Storyboard.TargetProperty="(Grid.Row)">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="1"/>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="blackBorder" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="whiteBorder" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
                         </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>

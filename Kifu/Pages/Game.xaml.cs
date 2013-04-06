@@ -1,5 +1,6 @@
 ﻿using GoLib;
 using GoLib.SGF;
+using Kifu.Common;
 using Kifu.Utils;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace Kifu.Pages
         Ongoing, StoneSelection, Finished
     }
 
-    public sealed partial class Game : Kifu.Common.LayoutAwarePage
+    public sealed partial class Game : LayoutAwarePage
     {
         private Goban _goban;
         private GameState _state;
@@ -84,17 +85,25 @@ namespace Kifu.Pages
             _state = GameState.Ongoing;
         }
 
+        /*
         // handles the Click event of the Button for showing the light dismiss with animations behavior
         private void ShowPopupAnimationClicked(object sender, RoutedEventArgs e)
         {
-            //if (!LightDismissAnimatedPopup.IsOpen) { LightDismissAnimatedPopup.IsOpen = true; }
+            if (!LightDismissAnimatedPopup.IsOpen)
+            {
+                double w = (Window.Current.Bounds.Width + 200) / 2;
+                double h = (Window.Current.Bounds.Height + 200) / 2;
+                LightDismissAnimatedPopup.HorizontalAlignment = HorizontalAlignment.Center;
+                LightDismissAnimatedPopup.VerticalAlignment = VerticalAlignment.Center;
+                LightDismissAnimatedPopup.IsOpen = true;
+            }
         }
 
         // Handles the Click event on the Button within the simple Popup control and simply closes it.
         private void CloseAnimatedPopupClicked(object sender, RoutedEventArgs e)
         {
-            //if (LightDismissAnimatedPopup.IsOpen) { LightDismissAnimatedPopup.IsOpen = false; }
-        }
+            if (LightDismissAnimatedPopup.IsOpen) { LightDismissAnimatedPopup.IsOpen = false; }
+        }*/
 
         #region AI values display
 
@@ -215,7 +224,6 @@ namespace Kifu.Pages
 
         private void submitButton_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: tester si le goban n'est pas vide (bug #1)
             State = GameState.Finished;
             Score score = _goban.Score;
             score.ComputeScore(); // TODO: calculer le score au fur et à mesure
@@ -382,15 +390,18 @@ namespace Kifu.Pages
         {
             _goban.Clear();
             AIMove();
+            blackScoreUi.Text = "0";
+            whiteScoreUi.Text = "0";
+            blackCapturedUi.Text = "0";
+            whiteCapturedUi.Text = "0";
             State = GameState.Ongoing;
         }
 
         private async void ShowMessageDialog(string title, string winner, string result)
         {
-            var messageDialog = new MessageDialog(string.Format("{0} win by {1}", winner, result), title) { DefaultCommandIndex = 1 };
+            var messageDialog = new MessageDialog(winner + " win by " + result, title) { DefaultCommandIndex = 1 };
             messageDialog.Commands.Add(new UICommand("Show board", null, 0));
             messageDialog.Commands.Add(new UICommand("Play again", null, 1));
-
 
             var commandChosen = await messageDialog.ShowAsync();
             if ((int)commandChosen.Id == 1)
