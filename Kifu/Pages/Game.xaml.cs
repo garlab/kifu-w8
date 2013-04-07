@@ -87,15 +87,14 @@ namespace Kifu.Pages
 
         #region NewGamePopup
 
+        /*
         private void NewGamePopup_Clicked(object sender, RoutedEventArgs e)
         {
             if (!NewGamePopup.IsOpen)
             {
                 NewGamePopup.HorizontalAlignment = HorizontalAlignment.Center;
                 NewGamePopup.HorizontalOffset = -100;
-
                 NewGamePopup.VerticalOffset = Window.Current.Bounds.Height / 2 - 100;
-
                 NewGamePopup.IsOpen = true;
             }
         }
@@ -103,7 +102,7 @@ namespace Kifu.Pages
         private void CloseNewGamePopup_Clicked(object sender, RoutedEventArgs e)
         {
             if (NewGamePopup.IsOpen) { NewGamePopup.IsOpen = false; }
-        }
+        }*/
 
         #endregion
 
