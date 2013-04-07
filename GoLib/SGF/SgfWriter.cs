@@ -24,20 +24,23 @@ namespace GoLib
 
         static void AddInfos(StringBuilder sgf, GameInfo info)
         {
-            sgf.Append(info + "\n");
+            sgf.Append(info);
         }
 
         private static void AddScore(StringBuilder sgf, Score score)
         {
-            sgf.Append(score + "\n");
+            sgf.Append(score);
         }
 
         static void AddHandicap(StringBuilder sgf, Goban goban)
         {
-            sgf.Append("AB");
-            foreach (var handicap in goban.Handicaps)
+            if (goban.Info.Handicap > 0)
             {
-                sgf.Append(handicap);
+                sgf.Append("AB");
+                foreach (var handicap in goban.Handicaps)
+                {
+                    sgf.Append(handicap);
+                }
             }
         }
 

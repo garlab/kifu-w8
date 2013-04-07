@@ -29,7 +29,7 @@
             <Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                     <Button x:Name="replayButton" Style="{StaticResource ReplayAppBarButtonStyle}" Click="replayButton_Click"/>
-                    <Button x:Name="openGameButton" Style="{StaticResource OpenAppBarButtonStyle}" Click="openGameButton_Click"/>
+                    <Button x:Name="openGameButton" Style="{StaticResource OpenAppBarButtonStyle}" Click="openButton_Click"/>
                     <Button x:Name="saveGameButton" Style="{StaticResource SaveAppBarButtonStyle}" Click="saveButton_Click"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">

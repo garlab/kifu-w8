@@ -155,6 +155,72 @@ namespace Kifu.Pages
         //*/
         #endregion
 
+        #region SGF
+
+        private async void openButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ApplicationView.Value != ApplicationViewState.Snapped || ApplicationView.TryUnsnap())
+            {
+                var openPicker = new FileOpenPicker();
+                openPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+                //openPicker.ViewMode = PickerViewMode.Thumbnail;
+                openPicker.FileTypeFilter.Clear();
+                openPicker.FileTypeFilter.Add(".sgf");
+                var file = await openPicker.PickSingleFileAsync();
+
+                if (file != null)
+                {
+                    var buffer = await FileIO.ReadBufferAsync(file);
+                    using (var reader = DataReader.FromBuffer(buffer))
+                    {
+                        string sgf = reader.ReadString(buffer.Length);
+                        _goban = SgfHelper.FromString(sgf);
+                        Replay();
+                    }
+
+                    //this.DataContext = file;
+                    //var mruToken = StorageApplicationPermissions.MostRecentlyUsedList.Add(file);
+                }
+            }
+        }
+
+        private async void saveButton_Click(object sender, RoutedEventArgs e)
+        {
+            // File picker APIs don't work if the app is in a snapped state.
+            // If the app is snapped, try to unsnap it first. Only show the picker if it unsnaps.
+            if (ApplicationView.Value != ApplicationViewState.Snapped || ApplicationView.TryUnsnap())
+            {
+                var savePicker = new FileSavePicker();
+                savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+                savePicker.FileTypeChoices.Add("Smart Game Format", new List<string>() { ".sgf" });
+                savePicker.DefaultFileExtension = ".sgf";
+                savePicker.SuggestedFileName = "Game " + DateTime.Now.ToString("u");
+                var file = await savePicker.PickSaveFileAsync();
+
+                if (null != file) // file is null if user cancels the file picker.
+                {
+                    string content = SgfHelper.ToString(_goban);
+                    using (var writeStream = await file.OpenAsync(FileAccessMode.ReadWrite))
+                    {
+                        writeStream.Size = 0;
+                        using (var oStream = writeStream.GetOutputStreamAt(0))
+                        {
+                            using (var dWriter = new DataWriter(oStream))
+                            {
+                                dWriter.WriteString(content);
+                                await dWriter.StoreAsync();
+                                await oStream.FlushAsync();
+                            }
+                        }
+                    }
+                    //this.DataContext = file;
+                    //var mruToken = StorageApplicationPermissions.MostRecentlyUsedList.Add(file);
+                }
+            }
+        }
+
+        #endregion
+
         #region events
 
         private void GobanCanvas_Loaded(object sender, RoutedEventArgs e)
@@ -237,47 +303,6 @@ namespace Kifu.Pages
             blackScoreUi.Text = score.Get(Colour.Black).ToString();
             whiteScoreUi.Text = score.Get(Colour.White).ToString();
             ShowMessageDialog("Game over", score.Winner.ToString(), score.Result);
-        }
-
-        private void openGameButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void newGameButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private async void saveButton_Click(object sender, RoutedEventArgs e)
-        {
-            // File picker APIs don't work if the app is in a snapped state.
-            // If the app is snapped, try to unsnap it first. Only show the picker if it unsnaps.
-            if (ApplicationView.Value != ApplicationViewState.Snapped || ApplicationView.TryUnsnap())
-            {
-                var savePicker = new FileSavePicker();
-                savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
-                savePicker.FileTypeChoices.Add("Smart Game Format", new List<string>() { ".sgf" });
-                savePicker.DefaultFileExtension = ".sgf";
-                savePicker.SuggestedFileName = "Game " + DateTime.Now.ToString("u");
-                var file = await savePicker.PickSaveFileAsync();
-
-                if (null != file) // file is null if user cancels the file picker.
-                {
-                    var content = SgfHelper.ToString(_goban);
-                    var writeStream = await file.OpenAsync(FileAccessMode.ReadWrite);
-                    writeStream.Size = 0;
-                    var oStream = writeStream.GetOutputStreamAt(0);
-                    var dWriter = new DataWriter(oStream);
-                    dWriter.WriteString(content);
-
-                    await dWriter.StoreAsync();
-                    await oStream.FlushAsync();
-
-                    //this.DataContext = file;
-                    //var mruToken = StorageApplicationPermissions.MostRecentlyUsedList.Add(file);
-                }
-            }
         }
 
         private void replayButton_Click(object sender, RoutedEventArgs e)

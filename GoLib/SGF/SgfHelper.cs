@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace GoLib.SGF
 {
     public static class SgfHelper
     {
-        public static String ToString(Goban goban)
+        public static string ToString(Goban goban)
         {
             return SgfWriter.ToSGF(goban);
+        }
+
+        public static Goban FromString(string sgf)
+        {
+            return SgfParser.SgfDecode(sgf);
         }
     }
 }

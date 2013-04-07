@@ -1,11 +1,6 @@
 ﻿using GoLib;
 using Kifu.Common;
 using Kifu.Utils;
-using System;
-using Windows.Storage;
-using Windows.Storage.Pickers;
-using Windows.Storage.Streams;
-using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -96,32 +91,6 @@ namespace Kifu.Pages
         private void Rules_Loaded(object sender, RoutedEventArgs e)
         {
             RuleView.SelectedValue = Settings.Rules;
-        }
-
-        private async void pickSgfButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (ApplicationView.Value != ApplicationViewState.Snapped || ApplicationView.TryUnsnap())
-            {
-                var openPicker = new FileOpenPicker();
-                openPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
-                //openPicker.ViewMode = PickerViewMode.Thumbnail;
-                openPicker.FileTypeFilter.Clear();
-                openPicker.FileTypeFilter.Add(".sgf");
-                var file = await openPicker.PickSingleFileAsync();
-
-                if (file != null)
-                {
-                    var buffer = await FileIO.ReadBufferAsync(file);
-                    using (var reader = DataReader.FromBuffer(buffer))
-                    {
-                        string content = reader.ReadString(buffer.Length);
-                        //sgfContent.Text = content;
-                    }
-
-                    //this.DataContext = file;
-                    //var mruToken = StorageApplicationPermissions.MostRecentlyUsedList.Add(file);
-                }
-            }
         }
     }
 }

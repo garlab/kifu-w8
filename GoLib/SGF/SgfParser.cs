@@ -207,17 +207,8 @@ namespace GoLib.SGF
 
             int lastIndex = LastIndex(sgf, index);
             int length = (lastIndex - index) + 1;
-            int number = 0;
-
-            try
-            {
-                number = int.Parse(new string(sgf, index, length));
-                index += length;
-            }
-            catch (FormatException)
-            {
-                success = false;
-            }
+            int number = number = int.Parse(new string(sgf, index, length));
+            index += length;
 
             return number;
         }
@@ -228,17 +219,8 @@ namespace GoLib.SGF
 
             int lastIndex = LastIndex(sgf, index);
             int length = (lastIndex - index) + 1;
-            double real = 0.0;
-
-            try
-            {
-                real = double.Parse(new string(sgf, index, length));
-                index += length;
-            }
-            catch (FormatException)
-            {
-                success = false;
-            }
+            double real = real = double.Parse(new string(sgf, index, length));
+            index += length;
 
             return real;
         }
@@ -311,7 +293,7 @@ namespace GoLib.SGF
 
         private static string ParseText(char[] sgf, ref int index, ref bool success)
         {
-            StringBuilder s = new StringBuilder();
+            var s = new StringBuilder();
 
             for (; index < sgf.Length; ++index)
             {
@@ -402,16 +384,20 @@ namespace GoLib.SGF
 
         private static int LastIndex(char[] sgf, int index)
         {
-            int lastIndex;
+            int lastIndex = index;
 
-            for (lastIndex = index; lastIndex < sgf.Length; lastIndex++)
+            while (lastIndex < sgf.Length && "0123456789+-.".IndexOf(sgf[lastIndex]) != -1)
             {
-                if ("0123456789+-.".IndexOf(sgf[lastIndex]) == -1) // TODO: faire un truc moins bourrin
-                {
-                    break;
-                }
+                ++lastIndex;
             }
             return lastIndex - 1;
+        }
+
+        private static void ThrowError(char[] sgf, int index, string message)
+        {
+            int line, column;
+            CursorPosition(sgf, index, out line, out column);
+            throw new Exception(message + " line : " + line + " column " + column);
         }
 
         private static void CursorPosition(char[] sgf, int index, out int line, out int column)
@@ -425,7 +411,7 @@ namespace GoLib.SGF
                 {
                     line++;
                     column = 1;
-                    if (i < index && sgf[i + 1] == '\r')
+                    if (i <= index && sgf[i + 1] == '\r')
                     {
                         i++;
                     }
@@ -434,7 +420,7 @@ namespace GoLib.SGF
                 {
                     line++;
                     column = 1;
-                    if (i < index && sgf[i + 1] == '\n')
+                    if (i <= index && sgf[i + 1] == '\n')
                     {
                         i++;
                     }
@@ -450,27 +436,6 @@ namespace GoLib.SGF
 
         private static Dictionary<string, MoveAction> _moveActions;
         private static Dictionary<string, GameInfoAction> _gameInfoActions;
-
-        static SgfParser()
-        {
-
-            _moveActions = new Dictionary<string, MoveAction>();
-            _moveActions["B"] = ParseBlackMove;
-            _moveActions["W"] = ParseWhiteMove;
-            _moveActions["C"] = null;
-            _moveActions["AB"] = ParseAddBlack;
-            _moveActions["AW"] = ParseAddWhite;
-            _moveActions["AE"] = ParseAddEmpty;
-            _moveActions["TB"] = null;
-            _moveActions["TW"] = null;
-
-            _gameInfoActions = new Dictionary<string, GameInfoAction>();
-            _gameInfoActions["RU"] = ParseRules;
-            _gameInfoActions["RE"] = ParseResult;
-            _gameInfoActions["HA"] = ParseHandicap;
-            _gameInfoActions["KM"] = ParseKomi;
-            _gameInfoActions["SZ"] = ParseSize;
-        }
 
         private static void AddGameInfoProperty(GameInfo gameInfo, string ident, char[] sgf, ref int index, ref bool success)
         {
@@ -530,6 +495,60 @@ namespace GoLib.SGF
             {
                 success = false;
             }
+        }
+
+        static SgfParser()
+        {
+            _gameInfoActions = new Dictionary<string, GameInfoAction>();
+            _moveActions = new Dictionary<string, MoveAction>();
+
+            // Root properties
+            _gameInfoActions["SZ"] = ParseSize;
+            _gameInfoActions["GM"] = ParseGameId;
+            _gameInfoActions["FF"] = ParseFileFormat;
+            _gameInfoActions["CA"] = ParseCharset;
+            _gameInfoActions["AP"] = ParseApplication;
+            _gameInfoActions["ST"] = ParseStyle;
+
+            // Game-Info properties
+            _gameInfoActions["RU"] = ParseRules;
+            _gameInfoActions["RE"] = ParseResult;
+            _gameInfoActions["HA"] = ParseHandicap;
+            _gameInfoActions["KM"] = ParseKomi;
+
+            _gameInfoActions["AB"] = ParseHandicapBlack;
+            _gameInfoActions["AW"] = ParseHandicapWhite;
+
+            // Move properties
+            _moveActions["B"] = ParseBlackMove;
+            _moveActions["W"] = ParseWhiteMove;
+            _moveActions["MN"] = null; // Move number
+            _moveActions["KO"] = null; // Ko
+
+            // Setup-Properties
+            _moveActions["AB"] = ParseAddBlack;
+            _moveActions["AW"] = ParseAddWhite;
+            _moveActions["AE"] = ParseAddEmpty;
+            _moveActions["PL"] = null; // Player to play
+
+            // Node-Annotations
+            _moveActions["TB"] = null; // Territories Black
+            _moveActions["TW"] = null; // Territories White
+            _moveActions["C"] = null; // Comments
+            _moveActions["DM"] = null; // Position is even
+            _moveActions["GB"] = null; // Good for Black
+            _moveActions["GW"] = null; // Good for White
+            _moveActions["HO"] = null; // Hotspot
+            _moveActions["N"] = null; // Node Name
+            _moveActions["UC"] = null; // Unclear
+            _moveActions["V"] = null; // Value
+
+            // Markup Properties
+            _moveActions["CR"] = null; // Circle
+            _moveActions["LB"] = null; // Label
+            _moveActions["MA"] = null; // Mark
+            _moveActions["SQ"] = null; // Square
+            _moveActions["TR"] = null; // Triangle
         }
 
         #endregion
@@ -616,9 +635,45 @@ namespace GoLib.SGF
                 }
                 else
                 {
-                    success = false;
+                    ThrowError(sgf, index, "Supported sizes: 9x9, 13x13 or 19x19");
                 }
             }
+        }
+
+        private static void ParseGameId(GameInfo gameInfo, char[] sgf, ref int index, ref bool success)
+        {
+            int gameId = ParseNumber(sgf, ref index, ref success);
+            if (gameId != 1)
+            {
+                ThrowError(sgf, index, "GM property must be set to 1 (Go Game)");
+            }
+        }
+
+        private static void ParseFileFormat(GameInfo gameInfo, char[] sgf, ref int index, ref bool success)
+        {
+            int ff = ParseNumber(sgf, ref index, ref success);
+            if (ff != 4)
+            {
+                ThrowError(sgf, index, "FF property must be set to '4'");
+            }
+        }
+
+        private static void ParseCharset(GameInfo gameInfo, char[] sgf, ref int index, ref bool success)
+        {
+            string ca = ParseText(sgf, ref index, ref success);
+            // TODO: Convertir les commentaires et autres selon ce format (ou pas ?)
+        }
+
+        private static void ParseApplication(GameInfo gameInfo, char[] sgf, ref int index, ref bool success)
+        {
+            string ap = ParseText(sgf, ref index, ref success);
+            // Useless, will be overwriten by "Kifu" once game saved
+        }
+
+        private static void ParseStyle(GameInfo gameInfo, char[] sgf, ref int index, ref bool success)
+        {
+            int st = ParseNumber(sgf, ref index, ref success);
+            // Useless, will be onverwriten by "4" once game saved
         }
 
         #endregion
