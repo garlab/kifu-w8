@@ -186,7 +186,7 @@ namespace Kifu.Pages
                 case ApplicationViewState.Filled:
                 case ApplicationViewState.FullScreenLandscape:
                 case ApplicationViewState.FullScreenPortrait:
-                    GobanSize = content.ActualHeight;
+                    GobanSize = content.ActualHeight + 120;
                     break;
                 case ApplicationViewState.Snapped:
                     GobanSize = 320;

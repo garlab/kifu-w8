@@ -111,7 +111,7 @@
                 </Grid>
             </Border>
 
-            <Canvas x:Name="gobanCanvas" Loaded="GobanCanvas_Loaded" PointerReleased="Canvas_PointerReleased" Margin="0, -188, 0, 0">
+            <Canvas x:Name="gobanCanvas" Loaded="GobanCanvas_Loaded" PointerReleased="Canvas_PointerReleased" Margin="0, -130, 0, 10">
                 <Canvas.Background>
                     <ImageBrush ImageSource="ms-appx:///Assets/Board.png"/>
                 </Canvas.Background>
