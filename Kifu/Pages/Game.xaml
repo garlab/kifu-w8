@@ -13,6 +13,17 @@
     <Page.Resources>
     </Page.Resources>
 
+    <common:LayoutAwarePage.TopAppBar>
+        <AppBar IsOpen="True">
+            <Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Button x:Name="homeButton" Style="{StaticResource HomeAppBarButtonStyle}" Click="GoBack" IsEnabled="{Binding Frame.CanGoBack, ElementName=pageRoot}"/>
+                    <Button x:Name="helpButton" Style="{StaticResource HelpAppBarButtonStyle}" Click="ShowHelp"/>
+                </StackPanel>
+            </Grid>
+        </AppBar>
+    </common:LayoutAwarePage.TopAppBar>
+    
     <common:LayoutAwarePage.BottomAppBar>
         <AppBar IsOpen="True">
             <Grid>
@@ -74,18 +85,20 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
+            <!--
             <Button x:Name="backButton" Click="GoBack" IsEnabled="{Binding Frame.CanGoBack, ElementName=pageRoot}" Style="{StaticResource BackButtonStyle}"/>
             <TextBlock x:Name="pageTitle" Grid.Column="1" x:Uid="AppName" Style="{StaticResource PageHeaderTextStyle}"/>
+            --> 
         </Grid>
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="320"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="320"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Border x:Name="blackBorder" Grid.Column="0" BorderBrush="Azure" BorderThickness="3" Height="200" Width="200" Margin="16" HorizontalAlignment="Center">
+            <Border x:Name="blackBorder" Grid.Column="0" BorderBrush="Azure" BorderThickness="3" Height="200" Width="200" Margin="6" HorizontalAlignment="Center">
                 <Grid>
                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                         <TextBlock Text="Black" FontSize="26"/>
@@ -98,7 +111,7 @@
                 </Grid>
             </Border>
 
-            <Border x:Name="whiteBorder" Grid.Column="2" BorderBrush="Azure" BorderThickness="3" Height="200" Width="200" Margin="16" HorizontalAlignment="Center">
+            <Border x:Name="whiteBorder" Grid.Column="2" BorderBrush="Azure" BorderThickness="3" Height="200" Width="200" Margin="6" HorizontalAlignment="Center">
                 <Grid>
                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                         <TextBlock Text="White" FontSize="26"/>

@@ -8,6 +8,7 @@ using System.Linq;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
+using Windows.System;
 using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Popups;
@@ -83,6 +84,11 @@ namespace Kifu.Pages
             _stones = new Image[info.Size, info.Size];
             _territories = new Rectangle[info.Size, info.Size];
             _state = GameState.Ongoing;
+        }
+
+        private async void ShowHelp(object sender, RoutedEventArgs e)
+        {
+            await Launcher.LaunchUriAsync(new Uri("http://en.wikipedia.org/wiki/Go_game"));
         }
 
         #region NewGamePopup
