@@ -34,12 +34,9 @@ namespace GoLib.SGF
 
         private static Goban ParseGameTree(char[] sgf, ref int index)
         {
-            if (LookAhead(sgf, index) != Tokens.CurlyOpen)
-            {
-                throw new Exception(Expected(sgf, index, '('));
-            }
-
+            Check(sgf, ref index, Tokens.CurlyOpen);
             NextToken(sgf, ref index);
+
             var gameInfo = ParseGameInfoProperties(sgf, ref index);
 
             var token = LookAhead(sgf, index);
@@ -50,27 +47,20 @@ namespace GoLib.SGF
             else
             {
                 var moves = ParseMoves(sgf, ref index);
-                if (LookAhead(sgf, index) == Tokens.CurlyClose)
-                {
-                    var goban = new Goban(gameInfo);
-                    // TODO: Add moves to goban
-                    return goban;
-                }
-                else
-                {
-                    throw new Exception(Expected(sgf, index, ')'));
-                }
+
+                Check(sgf, ref index, Tokens.CurlyClose);
+
+                var goban = new Goban(gameInfo);
+                // TODO: Add moves to goban
+                return goban;
             }
         }
 
         private static GameInfo ParseGameInfoProperties(char[] sgf, ref int index)
         {
-            if (LookAhead(sgf, index) != Tokens.SemiColon)
-            {
-                throw new Exception(Expected(sgf, index, ';'));
-            }
-
+            Check(sgf, ref index, Tokens.SemiColon);
             NextToken(sgf, ref index);
+
             var gameInfo = new GameInfo();
 
             while (LookAhead(sgf, index) == Tokens.UcLetter)
@@ -101,41 +91,28 @@ namespace GoLib.SGF
                 }
             }
 
-            if (LookAhead(sgf, index) == Tokens.CurlyOpen)
+            Check(sgf, ref index, Tokens.CurlyOpen);
+
+            while (LookAhead(sgf, index) == Tokens.CurlyOpen)
             {
-                while (LookAhead(sgf, index) == Tokens.CurlyOpen)
-                {
-                    var variation = ParseVariation(sgf, ref index);
-                    current.AddTree(variation);
-                }
-                return moves;
+                var variation = ParseVariation(sgf, ref index);
+                current.AddTree(variation);
             }
-            else
-            {
-                throw new Exception(Expected(sgf, index, '('));
-            }
+            return moves;
         }
 
         private static Tree<Move> ParseVariation(char[] sgf, ref int index)
         {
             NextToken(sgf, ref index); // token : (
 
-            if (LookAhead(sgf, index) != Tokens.SemiColon)
-            {
-                throw new Exception(Expected(sgf, index, ';'));
-            }
+            Check(sgf, ref index, Tokens.SemiColon);
 
             var moves = ParseMoves(sgf, ref index);
-            if (LookAhead(sgf, index) == Tokens.CurlyClose)
-            {
-                NextToken(sgf, ref index); // token : )
-                return moves;
-            }
-            else
-            {
 
-                throw new Exception(Expected(sgf, index, ')'));
-            }
+            Check(sgf, ref index, Tokens.CurlyClose);
+            NextToken(sgf, ref index); // token : )
+
+            return moves;
         }
 
         private static Move ParseMove(char[] sgf, ref int index)
@@ -275,6 +252,8 @@ namespace GoLib.SGF
             }
         }
 
+        #region parse util
+
         private static Tokens LookAhead(char[] sgf, int index)
         {
             int saveIndex = index;
@@ -311,6 +290,14 @@ namespace GoLib.SGF
             return Tokens.None;
         }
 
+        private static void Check(char[] sgf, ref int index, Tokens token)
+        {
+            if (LookAhead(sgf, index) != token)
+            {
+                throw new Exception(GetError(sgf, index, "Expected " + token.ToString()));
+            }
+        }
+
         private static void EatWhitespace(char[] sgf, ref int index)
         {
             while (index < sgf.Length && " \t\n\r".IndexOf(sgf[index]) != -1)
@@ -329,6 +316,8 @@ namespace GoLib.SGF
             }
             return lastIndex - 1;
         }
+
+        #endregion
 
         #region Properties
 
@@ -477,7 +466,7 @@ namespace GoLib.SGF
         // simpletext
         private static void ParseResult(GameInfo gameInfo, char[] sgf, ref int index)
         {
-
+            throw new NotImplementedException("");
         }
 
         private static void ParseHandicap(GameInfo gameInfo, char[] sgf, ref int index)
@@ -510,20 +499,25 @@ namespace GoLib.SGF
         // list of point
         private static void ParseHandicapBlack(GameInfo gameInfo, char[] sgf, ref int index)
         {
+            throw new NotImplementedException("ParseHandicapBlack");
         }
 
         // list of point
         private static void ParseHandicapWhite(GameInfo gameInfo, char[] sgf, ref int index)
         {
+            throw new NotImplementedException("");
         }
 
         private static void ParsePlayerBlack(GameInfo gameInfo, char[] sgf, ref int index)
         {
-
+            string player = ParseText(sgf, ref index);
+            // TODO: store playername
         }
 
         private static void ParsePlayerWhite(GameInfo gameInfo, char[] sgf, ref int index)
         {
+            string player = ParseText(sgf, ref index);
+            // TODO: store playername
         }
 
         #endregion
@@ -590,14 +584,17 @@ namespace GoLib.SGF
 
         private static void ParseAddBlack(Move move, char[] sgf, ref int index)
         {
+            throw new NotImplementedException("");
         }
 
         private static void ParseAddWhite(Move move, char[] sgf, ref int index)
         {
+            throw new NotImplementedException("");
         }
 
         private static void ParseAddEmpty(Move move, char[] sgf, ref int index)
         {
+            throw new NotImplementedException("");
         }
 
         #endregion
@@ -609,26 +606,32 @@ namespace GoLib.SGF
 
         private static void ParseComment(Move move, char[] sgf, ref int index)
         {
+            throw new NotImplementedException("");
         }
 
         private static void ParseLabel(Move move, char[] sgf, ref int index)
         {
+            throw new NotImplementedException("");
         }
 
         private static void ParseCircle(Move move, char[] sgf, ref int index)
         {
+            throw new NotImplementedException("");
         }
 
         private static void ParseSquare(Move move, char[] sgf, ref int index)
         {
+            throw new NotImplementedException("");
         }
 
         private static void ParseTriangle(Move move, char[] sgf, ref int index)
         {
+            throw new NotImplementedException("");
         }
 
         private static void ParseMark(Move move, char[] sgf, ref int index)
         {
+            throw new NotImplementedException("");
         }
 
         #endregion
