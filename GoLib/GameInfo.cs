@@ -4,25 +4,21 @@ namespace GoLib
 {
     public class GameInfo
     {
-        private int _handicap;
-        private Rules _rule;
-        private Player[] _players;
+        private int _handicap = 0;
+        private Rules _rule = Rules.Japanese;
 
         public GameInfo()
         {
-            _players = new Player[2];
-            _players[0] = new Player(Colour.Black);
-            _players[1] = new Player(Colour.White);
+            Size = 19;
+            Komi = 0;
+            Players = new Player[2] { new Player(Colour.Black), new Player(Colour.White) };
         }
 
         public int Size { get; set; }
 
         public double Komi { get; set; }
 
-        public Player[] Players
-        {
-            get { return _players; }
-        }
+        public Player[] Players { get; set; }
 
         public int Handicap
         {

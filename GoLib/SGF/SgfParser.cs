@@ -21,6 +21,7 @@ namespace GoLib.SGF
     delegate void MoveAction(Move move, char[] sgf, ref int index);
     delegate void GameInfoAction(GameInfo gameInfo, char[] sgf, ref int index);
 
+    // TODO: transformer en classe non-static
     static class SgfParser
     {
         public static Goban SgfDecode(string sgf)
@@ -66,7 +67,7 @@ namespace GoLib.SGF
                 var ident = ParsePropIdent(sgf, ref index);
                 AddGameInfoProperty(gameInfo, ident, sgf, ref index);
             }
-            return gameInfo; // TODO: check GameInfo consistency (perhaps some mandatory field like size are not set)
+            return gameInfo;
         }
 
         private static Tree<Move> ParseMoves(char[] sgf, ref int index)
@@ -217,11 +218,9 @@ namespace GoLib.SGF
                         throw new Exception(GetError(sgf, index, "A string must end with ']'"));
                     }
                     s.Append(sgf[++index]);
-                    // TODO: soft line breaks
                 }
                 else
                 {
-                    // TODO: convert whitespaces
                     s.Append(c);
                 }
             }
