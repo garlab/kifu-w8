@@ -35,7 +35,6 @@ namespace GoLib.SGF
         private static Goban ParseGameTree(char[] sgf, ref int index)
         {
             Check(sgf, ref index, Tokens.CurlyOpen);
-            NextToken(sgf, ref index);
 
             var gameInfo = ParseGameInfoProperties(sgf, ref index);
 
@@ -59,7 +58,6 @@ namespace GoLib.SGF
         private static GameInfo ParseGameInfoProperties(char[] sgf, ref int index)
         {
             Check(sgf, ref index, Tokens.SemiColon);
-            NextToken(sgf, ref index);
 
             var gameInfo = new GameInfo();
 
@@ -80,6 +78,7 @@ namespace GoLib.SGF
             {
                 while (LookAhead(sgf, index) == Tokens.SemiColon)
                 {
+                    NextToken(sgf, ref index);
                     var move = ParseMove(sgf, ref index);
                     current.Add(move);
                     current = current.Next;
@@ -91,10 +90,11 @@ namespace GoLib.SGF
                 }
             }
 
-            Check(sgf, ref index, Tokens.CurlyOpen);
+            Check(sgf, ref index, Tokens.CurlyOpen, false);
 
             while (LookAhead(sgf, index) == Tokens.CurlyOpen)
             {
+                NextToken(sgf, ref index);
                 var variation = ParseVariation(sgf, ref index);
                 current.AddTree(variation);
             }
@@ -103,23 +103,16 @@ namespace GoLib.SGF
 
         private static Tree<Move> ParseVariation(char[] sgf, ref int index)
         {
-            NextToken(sgf, ref index); // token : (
-
-            Check(sgf, ref index, Tokens.SemiColon);
-
+            //Check(sgf, ref index, Tokens.SemiColon);
             var moves = ParseMoves(sgf, ref index);
-
             Check(sgf, ref index, Tokens.CurlyClose);
-            NextToken(sgf, ref index); // token : )
 
             return moves;
         }
 
         private static Move ParseMove(char[] sgf, ref int index)
         {
-            NextToken(sgf, ref index); // token : ;
             var move = new Move();
-
             while (LookAhead(sgf, index) == Tokens.UcLetter)
             {
                 var ident = ParsePropIdent(sgf, ref index);
@@ -290,12 +283,13 @@ namespace GoLib.SGF
             return Tokens.None;
         }
 
-        private static void Check(char[] sgf, ref int index, Tokens token)
+        private static void Check(char[] sgf, ref int index, Tokens expected, bool peek = true)
         {
-            if (LookAhead(sgf, index) != token)
-            {
-                throw new Exception(GetError(sgf, index, "Expected " + token.ToString()));
-            }
+            var found = LookAhead(sgf, index);
+            if (found != expected)
+                throw new Exception(GetError(sgf, index, "Expected: " + expected + " found: " + found));
+            if (peek)
+                NextToken(sgf, ref index);
         }
 
         private static void EatWhitespace(char[] sgf, ref int index)
@@ -326,12 +320,7 @@ namespace GoLib.SGF
 
         private static void AddGameInfoProperty(GameInfo gameInfo, string ident, char[] sgf, ref int index)
         {
-            if (LookAhead(sgf, index) != Tokens.SquaredOpen)
-            {
-                throw new Exception(Expected(sgf, index, '('));
-            }
-
-            NextToken(sgf, ref index);
+            Check(sgf, ref index, Tokens.SquaredOpen);
 
             var action = _gameInfoActions[ident];
             if (action != null)
@@ -345,24 +334,12 @@ namespace GoLib.SGF
                 // TODO: Add to an internal dictionary
             }
 
-            if (LookAhead(sgf, index) == Tokens.SquaredClose)
-            {
-                NextToken(sgf, ref index);
-            }
-            else
-            {
-                throw new Exception(Expected(sgf, index, ')'));
-            }
+            Check(sgf, ref index, Tokens.SquaredClose);
         }
 
         private static void AddMoveProperty(Move move, string ident, char[] sgf, ref int index)
         {
-            if (LookAhead(sgf, index) != Tokens.SquaredOpen)
-            {
-                throw new Exception(Expected(sgf, index, '('));
-            }
-
-            NextToken(sgf, ref index);
+            Check(sgf, ref index, Tokens.SquaredOpen);
 
             var action = _moveActions[ident];
             if (action != null)
@@ -376,14 +353,7 @@ namespace GoLib.SGF
                 // TODO: Add to an internal dictionary
             }
 
-            if (LookAhead(sgf, index) == Tokens.SquaredClose)
-            {
-                NextToken(sgf, ref index);
-            }
-            else
-            {
-                throw new Exception(Expected(sgf, index, ')'));
-            }
+            Check(sgf, ref index, Tokens.SquaredClose);
         }
 
         static SgfParser()
@@ -571,11 +541,15 @@ namespace GoLib.SGF
         // point
         private static void ParseBlackMove(Move move, char[] sgf, ref int index)
         {
+            var point = ParsePoint(sgf, ref index);
+            move.Stone = new Stone(Colour.Black, point);
         }
 
         // point
         private static void ParseWhiteMove(Move move, char[] sgf, ref int index)
         {
+            var point = ParsePoint(sgf, ref index);
+            move.Stone = new Stone(Colour.White, point);
         }
 
         #endregion
@@ -637,11 +611,6 @@ namespace GoLib.SGF
         #endregion
 
         #region Error handling
-
-        private static string Expected(char[] sgf, int index, char expected)
-        {
-            return GetError(sgf, index, String.Format("Expected: '{0}'", expected));
-        }
 
         private static string GetError(char[] sgf, int index, string message)
         {
