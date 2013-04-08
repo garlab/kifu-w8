@@ -2,17 +2,15 @@
 {
     public class Player
     {
-        private Colour _color;
-
         public Player(Colour colour)
         {
-            _color = colour;
+            Color = colour;
+            Name = colour.ToString();
         }
 
-        public Colour Color
-        {
-            get { return _color; }
-        }
+        public Colour Color { get; private set; }
+
+        public string Name { get; set; }
 
         public bool IsHuman { get; set; }
     }

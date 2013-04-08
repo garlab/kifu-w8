@@ -11,7 +11,7 @@ namespace GoLib
         {
             Size = 19;
             Komi = 0;
-            Players = new Player[2] { new Player(Colour.Black), new Player(Colour.White) };
+            Players = new Player[] { new Player(Colour.Black), new Player(Colour.White) };
         }
 
         public int Size { get; set; }

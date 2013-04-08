@@ -479,14 +479,12 @@ namespace GoLib.SGF
 
         private static void ParsePlayerBlack(GameInfo gameInfo, char[] sgf, ref int index)
         {
-            string player = ParseText(sgf, ref index);
-            // TODO: store playername
+            gameInfo.Players[0].Name = ParseText(sgf, ref index);
         }
 
         private static void ParsePlayerWhite(GameInfo gameInfo, char[] sgf, ref int index)
         {
-            string player = ParseText(sgf, ref index);
-            // TODO: store playername
+            gameInfo.Players[1].Name = ParseText(sgf, ref index);
         }
 
         #endregion
