@@ -38,15 +38,11 @@
   <ItemGroup>
     <Compile Include="GameInfo.cs" />
     <Compile Include="Goban.cs" />
-    <Compile Include="History.cs" />
     <Compile Include="Move.cs" />
-    <Compile Include="Moves.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Score.cs" />
-    <Compile Include="SGF\SgfHelper.cs" />
-    <Compile Include="SGF\JsonParser.cs" />
     <Compile Include="SGF\SgfParser.cs" />
     <Compile Include="SGF\SgfWriter.cs" />
     <Compile Include="Stone.cs" />

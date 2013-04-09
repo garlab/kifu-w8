@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-namespace GoLib
+namespace GoLib.SGF
 {
     public static class SgfWriter
     {

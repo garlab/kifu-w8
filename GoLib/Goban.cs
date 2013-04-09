@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace GoLib
 {
@@ -25,23 +24,23 @@ namespace GoLib
 
     public class Goban
     {
-        private GameInfo _info;
-        private Score _score;
-        private Colour _first;
         private Section[,] _board;
         private List<Move> _moves;
-        private int[] _captured;
-        //private Tree<Move> _root;
-        //private Tree<Move> _current;
+
+        public GameInfo Info { get; private set; }
+        public Score Score { get; private set; }
+        public Colour First { get; private set; }
+        public int[] Captured { get; private set; }
+        public Tree<Move> Root { get; set; }
 
         public Goban(GameInfo info)
         {
-            _info = info;
-            _score = new Score(this);
-            _first = info.Handicap == 0 ? Colour.Black : Colour.White;
+            Info = info;
+            Score = new Score(this);
+            First = info.Handicap == 0 ? Colour.Black : Colour.White;
             _board = new Section[info.Size + 2, info.Size + 2];
             _moves = new List<Move>();
-            _captured = new int[2];
+            Captured = new int[2]; // TODO: merge with score
             Init();
         }
 
@@ -62,62 +61,42 @@ namespace GoLib
 
         private void Sentinels()
         {
-            int j = _info.Size + 1;
+            int j = Info.Size + 1;
             for (int i = 1; i < j; ++i)
             {
-                _board[0, i].stone = 
-                    _board[i, 0].stone = 
-                    _board[j, i].stone = 
+                _board[0, i].stone =
+                    _board[i, 0].stone =
+                    _board[j, i].stone =
                     _board[i, j].stone = Stone.FAKE;
             }
         }
 
         public void Clear()
         {
-            _captured[0] = _captured[1] = 0;
+            Captured[0] = Captured[1] = 0;
             Array.Clear(_board, 0, _board.Length);
             _moves.Clear();
-            _score.Clear();
+            Score.Clear();
             Init();
-        }
-
-        public int[] Captured
-        {
-            get { return _captured; }
-        }
-
-        public GameInfo Info
-        {
-            get { return _info; }
-        }
-
-        public Score Score
-        {
-            get { return _score; }
-        }
-
-        public Colour First
-        {
-            get { return _first; }
         }
 
         public IEnumerable<Point> Hoshis
         {
             get
             {
-                if (_info.Size < 9)
+                if (Info.Size < 9)
                 {
                     yield break;
                 }
-                int low = _info.Size == 9 ? 3 : 4;
-                int high = _info.Size - low + 1;
+                int low = Info.Size == 9 ? 3 : 4;
+                int high = Info.Size - low + 1;
                 yield return new Point(low, low);
                 yield return new Point(low, high);
                 yield return new Point(high, low);
                 yield return new Point(high, high);
-                if (_info.Size % 2 == 1)
+                if (Info.Size % 2 == 1)
                 {
-                    int middle = (_info.Size / 2 + 1);
+                    int middle = (Info.Size / 2 + 1);
                     yield return new Point(middle, middle);
                     yield return new Point(low, middle);
                     yield return new Point(middle, low);
@@ -132,13 +111,13 @@ namespace GoLib
             get
             {
                 var hoshis = new List<Point>(Hoshis);
-                if (_info.Handicap >= 1) yield return hoshis[0];
-                if (_info.Handicap >= 2) yield return hoshis[3];
-                if (_info.Handicap >= 3) yield return hoshis[1];
-                if (_info.Handicap >= 4) yield return hoshis[2];
-                if (_info.Handicap >= 6) { yield return hoshis[5]; yield return hoshis[7]; }
-                if (_info.Handicap >= 8) { yield return hoshis[6]; yield return hoshis[8]; }
-                if (_info.Handicap > 4 && _info.Handicap % 2 == 1) yield return hoshis[4];
+                if (Info.Handicap >= 1) yield return hoshis[0];
+                if (Info.Handicap >= 2) yield return hoshis[3];
+                if (Info.Handicap >= 3) yield return hoshis[1];
+                if (Info.Handicap >= 4) yield return hoshis[2];
+                if (Info.Handicap >= 6) { yield return hoshis[5]; yield return hoshis[7]; }
+                if (Info.Handicap >= 8) { yield return hoshis[6]; yield return hoshis[8]; }
+                if (Info.Handicap > 4 && Info.Handicap % 2 == 1) yield return hoshis[4];
             }
         }
 
@@ -186,12 +165,12 @@ namespace GoLib
 
         public Colour CurrentColour
         {
-            get { return Round % 2 == 0 ? _first : _first.OpponentColor(); }
+            get { return Round % 2 == 0 ? First : First.OpponentColor(); }
         }
 
         public Player CurrentPlayer
         {
-            get { return _info.Players[0].Color == CurrentColour ? _info.Players[0] : _info.Players[1]; }
+            get { return Info.Players[0].Color == CurrentColour ? Info.Players[0] : Info.Players[1]; }
         }
 
         public Stone Top
@@ -218,7 +197,6 @@ namespace GoLib
         {
             if (isEmpty(stone.Point) && !isKo(stone))
             {
-                // Liberties(stone).Count > 0 || GroupNeighbors(stone, true).Any(n => n.Liberties.Count > 1) || GroupNeighbors(stone).Any(n => n.Color == stone.Color.OpponentColor() && n.Liberties.Count == 1)
                 return ActualLiberties(stone).Count > 0 || CaptureValue(stone) > 0;
             }
             else
@@ -424,9 +402,9 @@ namespace GoLib
 
         public void EraseTerritories()
         {
-            for (int i = 1; i < _info.Size + 1; ++i)
+            for (int i = 1; i < Info.Size + 1; ++i)
             {
-                for (int j = 1; j < _info.Size + 1; ++j)
+                for (int j = 1; j < Info.Size + 1; ++j)
                 {
                     _board[i, j].territory = null;
                 }
@@ -473,7 +451,7 @@ namespace GoLib
                     {
                         _board[x, y].territory = _board[x, y - 1].territory;
                         _board[x, y].territory.Points.Add(liberty);
-                        Merge(_board[x, y].territory, _board[x - 1, y].territory);  
+                        Merge(_board[x, y].territory, _board[x - 1, y].territory);
                     }
                 }
                 AddOwner(_board[x, y].territory, liberty);

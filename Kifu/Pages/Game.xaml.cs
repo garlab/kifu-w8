@@ -1,5 +1,4 @@
 ﻿using GoLib;
-using GoLib.SGF;
 using Kifu.Common;
 using Kifu.Utils;
 using System;

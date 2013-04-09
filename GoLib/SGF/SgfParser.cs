@@ -22,7 +22,7 @@ namespace GoLib.SGF
     delegate void GameInfoAction(GameInfo gameInfo, char[] sgf, ref int index);
 
     // TODO: transformer en classe non-static
-    static class SgfParser
+    public static class SgfParser
     {
         public static Goban SgfDecode(string sgf)
         {
@@ -39,19 +39,17 @@ namespace GoLib.SGF
 
             var gameInfo = ParseGameInfoProperties(sgf, ref index);
 
-            var token = LookAhead(sgf, index);
-            if (token == Tokens.CurlyClose)
+            if (LookAhead(sgf, index) == Tokens.CurlyClose)
             {
                 return new Goban(gameInfo);
             }
             else
             {
-                var moves = ParseMoves(sgf, ref index);
+                var goban = new Goban(gameInfo);
+                goban.Root = ParseMoves(sgf, ref index);
 
                 Check(sgf, ref index, Tokens.CurlyClose);
 
-                var goban = new Goban(gameInfo);
-                // TODO: Add moves to goban
                 return goban;
             }
         }
@@ -395,12 +393,12 @@ namespace GoLib.SGF
             // Node-Annotations
             _moveActions["TB"] = null; // Territories Black
             _moveActions["TW"] = null; // Territories White
-            _moveActions["C"] = null; // Comments
+            _moveActions["C"] = ParseComment; // Comments
             _moveActions["DM"] = null; // Position is even
             _moveActions["GB"] = null; // Good for Black
             _moveActions["GW"] = null; // Good for White
             _moveActions["HO"] = null; // Hotspot
-            _moveActions["N"] = null; // Node Name
+            _moveActions["N"] = ParseName; // Node Name
             _moveActions["UC"] = null; // Unclear
             _moveActions["V"] = null; // Value
 
@@ -533,18 +531,14 @@ namespace GoLib.SGF
 
         #region Move properties
 
-        // point
         private static void ParseBlackMove(Move move, char[] sgf, ref int index)
         {
-            var point = ParsePoint(sgf, ref index);
-            move.Stone = new Stone(Colour.Black, point);
+            move.Stone = new Stone(Colour.Black, ParsePoint(sgf, ref index));
         }
 
-        // point
         private static void ParseWhiteMove(Move move, char[] sgf, ref int index)
         {
-            var point = ParsePoint(sgf, ref index);
-            move.Stone = new Stone(Colour.White, point);
+            move.Stone = new Stone(Colour.White, ParsePoint(sgf, ref index));
         }
 
         #endregion
@@ -568,15 +562,24 @@ namespace GoLib.SGF
 
         #endregion
 
+        #region Node-Annotations
+
+        private static void ParseComment(Move move, char[] sgf, ref int index)
+        {
+            move.Comment = ParseText(sgf, ref index);
+        }
+
+        private static void ParseName(Move move, char[] sgf, ref int index)
+        {
+            move.Name = ParseText(sgf, ref index);
+        }
+
+        #endregion
+
         #region other properties
 
         // créer ces methodes pour moves aussi ?
         // -> imbriguer un move dans GameInfo
-
-        private static void ParseComment(Move move, char[] sgf, ref int index)
-        {
-            throw new NotImplementedException("");
-        }
 
         private static void ParseLabel(Move move, char[] sgf, ref int index)
         {

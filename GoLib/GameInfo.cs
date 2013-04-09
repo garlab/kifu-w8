@@ -7,18 +7,16 @@ namespace GoLib
         private int _handicap = 0;
         private Rules _rule = Rules.Japanese;
 
+        public int Size { get; set; }
+        public double Komi { get; set; }
+        public Player[] Players { get; set; }
+
         public GameInfo()
         {
             Size = 19;
             Komi = 0;
             Players = new Player[] { new Player(Colour.Black), new Player(Colour.White) };
         }
-
-        public int Size { get; set; }
-
-        public double Komi { get; set; }
-
-        public Player[] Players { get; set; }
 
         public int Handicap
         {

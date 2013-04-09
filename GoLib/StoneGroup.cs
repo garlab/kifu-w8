@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace GoLib
 {
     public class StoneGroup
     {
-        private HashSet<Stone> _stones;
-        private HashSet<Point> _liberties;
-        private HashSet<Territory> _territories;
-        private Colour _color;
+        public HashSet<Stone> Stones { get; private set; }
+        public HashSet<Point> Liberties { get; private set; }
+        public HashSet<Territory> Territories { get; private set; }
+        public Colour Color { get; private set; }
+
         private bool _alive;
+
+        #region Event
 
         public static event EventHandler Changed;
 
@@ -21,20 +23,22 @@ namespace GoLib
                 Changed(this, e);
         }
 
+        #endregion
+
         public StoneGroup(Stone stone, IEnumerable<Point> liberties)
         {
-            _stones = new HashSet<Stone>();
-            _liberties = new HashSet<Point>();
-            _territories = new HashSet<Territory>();
-            _color = stone.Color;
+            Stones = new HashSet<Stone>();
+            Liberties = new HashSet<Point>();
+            Territories = new HashSet<Territory>();
+            Color = stone.Color;
             _alive = true;
             Add(stone, liberties);
         }
 
         public void Add(Stone stone, IEnumerable<Point> liberties)
         {
-            _stones.Add(stone);
-            _liberties.UnionWith(liberties);
+            Stones.Add(stone);
+            Liberties.UnionWith(liberties);
         }
 
         public bool Alive
@@ -44,8 +48,8 @@ namespace GoLib
             {
                 if (_alive == value) return;
                 _alive = value;
-                var color = _alive ? Colour.None : _color.OpponentColor();
-                foreach (var territory in _territories)
+                var color = _alive ? Colour.None : Color.OpponentColor();
+                foreach (var territory in Territories)
                 {
                     territory.Mark = color;
                 }
@@ -53,36 +57,16 @@ namespace GoLib
             }
         }
 
-        public HashSet<Point> Liberties
-        {
-            get { return _liberties; }
-        }
-
-        public HashSet<Stone> Stones
-        {
-            get { return _stones; }
-        }
-
-        public HashSet<Territory> Territories
-        {
-            get { return _territories; }
-        }
-
-        public Colour Color
-        {
-            get { return _color; }
-        }
-
         internal void Merge(StoneGroup toMerge)
         {
-            _stones.UnionWith(toMerge._stones);
-            _liberties.UnionWith(toMerge._liberties);
+            Stones.UnionWith(toMerge.Stones);
+            Liberties.UnionWith(toMerge.Liberties);
         }
 
         public override string ToString()
         {
-            var sb = new StringBuilder((_stones.Count + 1) * 4);
-            foreach (var stone in _stones)
+            var sb = new StringBuilder((Stones.Count + 1) * 4);
+            foreach (var stone in Stones)
             {
                 sb.Append(stone.Point);
             }

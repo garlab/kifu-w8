@@ -7,9 +7,11 @@ namespace GoLib
 {
     public class Move
     {
-        private Stone _stone;
-        private HashSet<Stone> _captured;
-        private Stone _ko;
+        public Stone Stone { get; set; }
+        public HashSet<Stone> Captured { get; set; }
+        public Stone Ko { get; set; }
+        public string Comment { get; set; }
+        public string Name { get; set; }
 
         public Move()
             : this(null, null)
@@ -18,27 +20,9 @@ namespace GoLib
 
         public Move(Stone stone, HashSet<Stone> captured)
         {
-            _stone = stone;
-            _captured = captured;
-            _ko = null;
-        }
-
-        public Stone Stone
-        {
-            get { return _stone; }
-            internal set { _stone = value; }
-        }
-
-        public HashSet<Stone> Captured
-        {
-            get { return _captured; }
-            internal set { _captured = value; }
-        }
-
-        public Stone Ko
-        {
-            get { return _ko; }
-            set { _ko = value; }
+            Stone = stone;
+            Captured = captured;
+            Ko = null;
         }
     }
 }

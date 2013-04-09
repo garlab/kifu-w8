@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace GoLib.Utils
 {
-    class Tree<T>
+    public class Tree<T>
     {
         private T _data;
         private Tree<T> _parent;

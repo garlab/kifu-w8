@@ -130,6 +130,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\Settings.cs" />
+    <Compile Include="Utils\SgfHelper.cs" />
     <Compile Include="Utils\XLinq.cs" />
   </ItemGroup>
   <ItemGroup>
