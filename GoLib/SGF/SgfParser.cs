@@ -321,15 +321,14 @@ namespace GoLib.SGF
         {
             Check(sgf, ref index, Tokens.SquaredOpen);
 
-            var action = _gameInfoActions[ident];
-            if (action != null)
+            if (_gameInfoActions.ContainsKey(ident))
             {
-                action(gameInfo, sgf, ref index);
+                _gameInfoActions[ident](gameInfo, sgf, ref index);
             }
             else
             {
                 string b = ParseText(sgf, ref index);
-                Warning(sgf, index, "Unsupported property: " + b);
+                Warning(sgf, index, "Unsupported game-info property: " + b);
                 // TODO: Add to an internal dictionary
             }
 
@@ -340,15 +339,14 @@ namespace GoLib.SGF
         {
             Check(sgf, ref index, Tokens.SquaredOpen);
 
-            var action = _moveActions[ident];
-            if (action != null)
+            if (_moveActions.ContainsKey(ident))
             {
-                action(move, sgf, ref index);
+                _moveActions[ident](move, sgf, ref index);
             }
             else
             {
                 string b = ParseText(sgf, ref index);
-                Warning(sgf, index, "Unsupported property: " + b);
+                Warning(sgf, index, "Unsupported move property: " + b);
                 // TODO: Add to an internal dictionary
             }
 
