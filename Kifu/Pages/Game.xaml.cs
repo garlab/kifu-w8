@@ -2,11 +2,7 @@
 using Kifu.Common;
 using Kifu.Utils;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using Windows.Storage;
-using Windows.Storage.Pickers;
-using Windows.Storage.Streams;
 using Windows.System;
 using Windows.UI;
 using Windows.UI.Core;
@@ -85,11 +81,6 @@ namespace Kifu.Pages
             _state = GameState.Ongoing;
         }
 
-        private async void ShowHelp(object sender, RoutedEventArgs e)
-        {
-            await Launcher.LaunchUriAsync(new Uri("http://en.wikipedia.org/wiki/Go_game"));
-        }
-
         #region NewGamePopup
 
         /*
@@ -154,73 +145,34 @@ namespace Kifu.Pages
         //*/
         #endregion
 
-        #region SGF
+        #region Events
+
+        private async void ShowHelp(object sender, RoutedEventArgs e)
+        {
+            await Launcher.LaunchUriAsync(new Uri("http://en.wikipedia.org/wiki/Go_game"));
+        }
 
         private async void openButton_Click(object sender, RoutedEventArgs e)
         {
             if (ApplicationView.Value != ApplicationViewState.Snapped || ApplicationView.TryUnsnap())
             {
-                var openPicker = new FileOpenPicker();
-                openPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
-                //openPicker.ViewMode = PickerViewMode.Thumbnail;
-                openPicker.FileTypeFilter.Clear();
-                openPicker.FileTypeFilter.Add(".sgf");
-                var file = await openPicker.PickSingleFileAsync();
-
-                if (file != null)
+                var sgf = await SgfHelper.Open();
+                if (sgf != null)
                 {
-                    var buffer = await FileIO.ReadBufferAsync(file);
-                    using (var reader = DataReader.FromBuffer(buffer))
-                    {
-                        string sgf = reader.ReadString(buffer.Length);
-                        _goban = SgfHelper.FromString(sgf);
-                        Replay();
-                    }
-
-                    //this.DataContext = file;
-                    //var mruToken = StorageApplicationPermissions.MostRecentlyUsedList.Add(file);
+                    _goban = SgfHelper.FromString(sgf);
+                    Replay();
                 }
             }
         }
 
         private async void saveButton_Click(object sender, RoutedEventArgs e)
         {
-            // File picker APIs don't work if the app is in a snapped state.
-            // If the app is snapped, try to unsnap it first. Only show the picker if it unsnaps.
             if (ApplicationView.Value != ApplicationViewState.Snapped || ApplicationView.TryUnsnap())
             {
-                var savePicker = new FileSavePicker();
-                savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
-                savePicker.FileTypeChoices.Add("Smart Game Format", new List<string>() { ".sgf" });
-                savePicker.DefaultFileExtension = ".sgf";
-                savePicker.SuggestedFileName = "Game " + DateTime.Now.ToString("u");
-                var file = await savePicker.PickSaveFileAsync();
-
-                if (null != file) // file is null if user cancels the file picker.
-                {
-                    string content = SgfHelper.ToString(_goban);
-                    using (var writeStream = await file.OpenAsync(FileAccessMode.ReadWrite))
-                    {
-                        writeStream.Size = 0;
-                        using (var oStream = writeStream.GetOutputStreamAt(0))
-                        {
-                            using (var dWriter = new DataWriter(oStream))
-                            {
-                                dWriter.WriteString(content);
-                                await dWriter.StoreAsync();
-                                await oStream.FlushAsync();
-                            }
-                        }
-                    }
-                    //this.DataContext = file;
-                    //var mruToken = StorageApplicationPermissions.MostRecentlyUsedList.Add(file);
-                }
+                string sgf = SgfHelper.ToString(_goban);
+                await SgfHelper.Save(sgf);
             }
         }
-
-        #endregion
-
-        #region events
 
         private void GobanCanvas_Loaded(object sender, RoutedEventArgs e)
         {
@@ -370,7 +322,7 @@ namespace Kifu.Pages
         public void UpdateButtons()
         {
             this.passButton.IsEnabled = _state == GameState.Ongoing;
-            this.undoButton.IsEnabled = _state != GameState.Finished && _goban.Moves.Count != 0;
+            this.undoButton.IsEnabled = _state != GameState.Finished && _goban.Moves.Count > 0;
             this.giveUpButton.IsEnabled = _state != GameState.Finished;
             this.submitButton.IsEnabled = _state == GameState.StoneSelection;
         }

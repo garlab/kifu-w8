@@ -48,7 +48,7 @@ namespace GoLib.SGF
         {
             foreach (var move in moves)
             {
-                sgf.Append("\n;" + move.Stone);
+                sgf.Append(move);
             }
         }
 

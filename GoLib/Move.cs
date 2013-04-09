@@ -24,5 +24,10 @@ namespace GoLib
             Captured = captured;
             Ko = null;
         }
+
+        public override string ToString()
+        {
+            return "\n;" + Stone;
+        }
     }
 }
