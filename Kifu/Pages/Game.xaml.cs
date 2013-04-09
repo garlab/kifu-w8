@@ -209,7 +209,7 @@ namespace Kifu.Pages
                 case ApplicationViewState.Filled:
                 case ApplicationViewState.FullScreenLandscape:
                 case ApplicationViewState.FullScreenPortrait:
-                    GobanSize = content.ActualHeight + 120;
+                    GobanSize = content.ActualHeight - 20;
                     break;
                 case ApplicationViewState.Snapped:
                     GobanSize = 320;
@@ -327,6 +327,7 @@ namespace Kifu.Pages
             this.submitButton.IsEnabled = _state == GameState.StoneSelection;
         }
 
+        // TODO: add event (UpdateCaptured)
         private void UpdateCaptured(Colour colour, int captured)
         {
             var ui = colour == Colour.Black ? blackCapturedUi : whiteCapturedUi;
@@ -348,6 +349,7 @@ namespace Kifu.Pages
             DrawMarker();
         }
 
+        // TODO: add event
         private void Undo()
         {
             Move undo = _goban.Undo();
