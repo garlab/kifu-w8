@@ -25,8 +25,8 @@ namespace GoLib
     public class Goban
     {
         private Section[,] _board;
-        private List<Move> _moves;
 
+        public List<Move> Moves { get; private set; }
         public GameInfo Info { get; private set; }
         public Score Score { get; private set; }
         public Colour First { get; private set; }
@@ -39,7 +39,7 @@ namespace GoLib
             Score = new Score(this);
             First = info.Handicap == 0 ? Colour.Black : Colour.White;
             _board = new Section[info.Size + 2, info.Size + 2];
-            _moves = new List<Move>();
+            Moves = new List<Move>();
             Captured = new int[2]; // TODO: merge with score
             Init();
         }
@@ -75,12 +75,12 @@ namespace GoLib
         {
             Captured[0] = Captured[1] = 0;
             Array.Clear(_board, 0, _board.Length);
-            _moves.Clear();
+            Moves.Clear();
             Score.Clear();
             Init();
         }
 
-        #region Utils
+        #region Points generators
 
         public IEnumerable<Point> Hoshis
         {
@@ -123,19 +123,82 @@ namespace GoLib
             }
         }
 
+        private IEnumerable<Point> Neighbors(Point p)
+        {
+            yield return new Point(p.X + 1, p.Y);
+            yield return new Point(p.X, p.Y + 1);
+            yield return new Point(p.X - 1, p.Y);
+            yield return new Point(p.X, p.Y - 1);
+        }
+
         #endregion
+
+        #region Moves
 
         public int Round
         {
-            get { return _moves.Count; } // TODO: risque de perdre en fiabilité
+            get { return Moves.Count; } // TODO: risque de perdre en fiabilité
         }
 
-        public List<Move> Moves
+        public Stone Top
         {
-            get { return _moves; }
+            get { return Moves.Count == 0 ? null : Moves[Moves.Count - 1].Stone; }
         }
 
+        private bool isKo(Stone stone)
+        {
+            return Moves.Count != 0 && stone == Moves[Moves.Count - 1].Ko;
+        }
 
+        private void UpdateKo(Move move)
+        {
+            if (StoneGroup(move.Stone).Stones.Count == 1
+                && StoneGroup(move.Stone).Liberties.Count == 1
+                && move.Captured.Count == 1)
+            {
+                move.Ko = move.Captured.First();
+            }
+        }
+
+        public Move Move(Stone stone)
+        {
+            var move = new Move(stone, Add(stone));
+            UpdateKo(move);
+            Moves.Add(move);
+            return move;
+        }
+
+        // Retourne le dernier coup joué et annule celui-ci
+        // Si aucun n'a été joué, ou si c'est une passe, retourne null
+        public Move Undo()
+        {
+            if (Moves.Count == 0)
+            {
+                return null;
+            }
+
+            var move = Moves.Last();
+            Moves.Remove(move);
+
+            if (move.Stone.IsPass)
+            {
+                return null;
+            }
+
+            Remove(move.Stone);
+            foreach (var captured in move.Captured)
+            {
+                Add(captured);
+            }
+            return move;
+        }
+
+        public void Pass()
+        {
+            Moves.Add(new Move(new Stone(CurrentColour, Point.Empty), null));
+        }
+
+        #endregion
 
         public IEnumerable<Territory> Territories
         {
@@ -179,11 +242,6 @@ namespace GoLib
             get { return Info.Players[0].Color == CurrentColour ? Info.Players[0] : Info.Players[1]; }
         }
 
-        public Stone Top
-        {
-            get { return Moves.Count == 0 ? null : Moves[Moves.Count - 1].Stone; }
-        }
-
         public Stone GetStone(Point point)
         {
             return _board[point.X, point.Y].stone;
@@ -201,7 +259,7 @@ namespace GoLib
 
         public bool IsMoveValid(Stone stone)
         {
-            if (isEmpty(stone.Point) && !isKo(stone))
+            if (IsEmpty(stone.Point) && !isKo(stone))
             {
                 return ActualLiberties(stone).Count > 0 || CaptureValue(stone) > 0;
             }
@@ -230,22 +288,9 @@ namespace GoLib
             return v.Sum();
         }
 
-        public bool isEmpty(Point p)
+        public bool IsEmpty(Point p)
         {
             return _board[p.X, p.Y].stone == null;
-        }
-
-        private bool isKo(Stone stone)
-        {
-            return _moves.Count != 0 && stone == _moves[_moves.Count - 1].Ko;
-        }
-
-        private IEnumerable<Point> Neighbors(Point p)
-        {
-            yield return new Point(p.X + 1, p.Y);
-            yield return new Point(p.X, p.Y + 1);
-            yield return new Point(p.X - 1, p.Y);
-            yield return new Point(p.X, p.Y - 1);
         }
 
         private IEnumerable<Stone> StoneNeighbors(Stone stone, bool sameColor = false)
@@ -273,29 +318,11 @@ namespace GoLib
             return groups.Distinct();
         }
 
-        public Move Move(Stone stone)
-        {
-            var move = new Move(stone, Add(stone));
-            UpdateKo(move);
-            _moves.Add(move);
-            return move;
-        }
-
         private HashSet<Stone> Add(Stone stone)
         {
             _board[stone.Point.X, stone.Point.Y].stone = stone;
             AddGroup(stone);
             return RemoveNeighborLiberties(stone);
-        }
-
-        private void UpdateKo(Move move)
-        {
-            if (StoneGroup(move.Stone).Stones.Count == 1
-                && StoneGroup(move.Stone).Liberties.Count == 1
-                && move.Captured.Count == 1)
-            {
-                move.Ko = move.Captured.First();
-            }
         }
 
         private void AddGroup(Stone stone)
@@ -517,36 +544,6 @@ namespace GoLib
             public Stone stone;
             public StoneGroup stoneGroup;
             public Territory territory;
-        }
-
-        // Retourne le dernier coup joué et annule celui-ci
-        // Si aucun n'a été joué, ou si c'est une passe, retourne null
-        public Move Undo()
-        {
-            if (_moves.Count == 0)
-            {
-                return null;
-            }
-
-            var move = _moves.Last();
-            _moves.Remove(move);
-
-            if (move.Stone.IsPass)
-            {
-                return null;
-            }
-
-            Remove(move.Stone);
-            foreach (var captured in move.Captured)
-            {
-                Add(captured);
-            }
-            return move;
-        }
-
-        public void Pass()
-        {
-            _moves.Add(new Move(new Stone(CurrentColour, Point.Empty), null));
         }
     }
 }

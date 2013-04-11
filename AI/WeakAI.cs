@@ -162,7 +162,7 @@ namespace AI
         {
             foreach (var corner in Corner())
             {
-                if (_goban.isEmpty(corner))
+                if (_goban.IsEmpty(corner))
                 {
                     var stone = new Stone(_color, corner);
                     if (_goban.Liberties(stone).Count() == 4)
