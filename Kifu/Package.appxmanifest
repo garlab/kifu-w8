@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
-  <Identity Name="11582AnthonyGarcia.Kifu" Publisher="CN=9B5BA61D-CB67-4447-B364-2D152D0E2018" Version="1.0.0.10" />
+  <Identity Name="11582AnthonyGarcia.Kifu" Publisher="CN=9B5BA61D-CB67-4447-B364-2D152D0E2018" Version="1.0.0.11" />
   <Properties>
     <DisplayName>Kifu</DisplayName>
     <PublisherDisplayName>Anthony Garcia</PublisherDisplayName>

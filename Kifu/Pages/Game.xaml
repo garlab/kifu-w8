@@ -32,19 +32,20 @@
                     <Button x:Name="openGameButton" Style="{StaticResource OpenAppBarButtonStyle}" Click="openButton_Click"/>
                     <Button x:Name="saveGameButton" Style="{StaticResource SaveAppBarButtonStyle}" Click="saveButton_Click"/>
                 </StackPanel>
+                <!--
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button x:Name="firstButton" Content="First" Style="{StaticResource PreviousAppBarButtonStyle}"/>
+                    <Button x:Name="prevButton" Content="Prev"  Click="GoPrev"/>
+                    <Button x:Name="nextButton" Content="Next"  Click="GoNext"/>
+                    <Button x:Name="lastButton" Content="Last"  Click="GoLast"/>
+                </StackPanel>
+                -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button x:Name="passButton" Style="{StaticResource PassAppBarButtonStyle}" Click="passButton_Click"/>
                     <Button x:Name="undoButton" Style="{StaticResource UndoAppBarButtonStyle}" Click="undoButton_Click" IsEnabled="False"/>
                     <Button x:Name="giveUpButton" Style="{StaticResource GiveUpAppBarButtonStyle}" Click="giveUpButton_Click"/>
                     <Button x:Name="submitButton" Style="{StaticResource SubmitAppBarButtonStyle}" Click="submitButton_Click" IsEnabled="False"/>
                 </StackPanel>
-                <!--
-                <StackPanel Orientation="Horizontal">
-                    <Button x:Name="firstButton" Content="First"  Click="GoFirst"/>
-                    <Button x:Name="prevButton" Content="Prev"  Click="GoPrev"/>
-                    <Button x:Name="nextButton" Content="Next"  Click="GoNext"/>
-                    <Button x:Name="lastButton" Content="Last"  Click="GoLast"/>
-                </StackPanel>-->
             </Grid>
         </AppBar>
     </common:LayoutAwarePage.BottomAppBar>

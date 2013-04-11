@@ -80,6 +80,8 @@ namespace GoLib
             Init();
         }
 
+        #region Utils
+
         public IEnumerable<Point> Hoshis
         {
             get
@@ -121,6 +123,8 @@ namespace GoLib
             }
         }
 
+        #endregion
+
         public int Round
         {
             get { return _moves.Count; } // TODO: risque de perdre en fiabilité
@@ -130,6 +134,8 @@ namespace GoLib
         {
             get { return _moves; }
         }
+
+
 
         public IEnumerable<Territory> Territories
         {
